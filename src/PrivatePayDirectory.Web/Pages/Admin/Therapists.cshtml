@@ -1,0 +1,55 @@
+@page
+@model PrivatePayDirectory.Web.Pages.Admin.TherapistsModel
+@{
+    ViewData["Title"] = "Admin — Therapist Profiles";
+}
+
+<h1>Therapist Profiles</h1>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<table class="admin-table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Visible</th>
+            <th>Created</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var t in Model.Therapists)
+        {
+            <tr class="@(t.IsVisible ? "" : "row-pending")">
+                <td>
+                    @if (t.IsVisible)
+                    {
+                        <a asp-page="/Therapist/Profile" asp-route-id="@t.TherapistId">
+                            @t.FirstName @t.LastName
+                        </a>
+                    }
+                    else
+                    {
+                        @($"{t.FirstName} {t.LastName}")
+                    }
+                </td>
+                <td>@t.Email</td>
+                <td>@(t.IsVisible ? "✓ Visible" : "⏳ Pending")</td>
+                <td>@t.CreatedAt.ToString("MM/dd/yyyy")</td>
+                <td>
+                    <form method="post">
+                        <input type="hidden" name="therapistId" value="@t.TherapistId" />
+                        <input type="hidden" name="isVisible" value="@(!t.IsVisible)" />
+                        <button type="submit" class="btn btn-sm @(t.IsVisible ? "btn-warning" : "btn-success")">
+                            @(t.IsVisible ? "Hide" : "Approve")
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

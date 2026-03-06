@@ -1,0 +1,109 @@
+@page "{id}"
+@model PrivatePayDirectory.Web.Pages.Therapist.ProfileModel
+@{
+    ViewData["Title"] = $"{Model.Therapist.FirstName} {Model.Therapist.LastName}, {Model.Therapist.Title}";
+    var t = Model.Therapist;
+}
+
+<div class="profile-layout">
+    <aside class="profile-sidebar">
+        @if (t.ProfilePhotoKey != null)
+        {
+            <img src="@Model.PhotoUrl" alt="@t.FirstName @t.LastName" class="profile-photo" />
+        }
+        else
+        {
+            <img src="~/images/default-profile.svg" alt="No photo available" class="profile-photo" />
+        }
+
+        <div class="session-badges">
+            @if (t.OffersVirtual) { <span class="badge badge-virtual">Virtual</span> }
+            @if (t.OffersInPerson) { <span class="badge badge-inperson">In-Person</span> }
+        </div>
+
+        @if (t.AcceptingNewClients)
+        {
+            <p class="accepting-badge">✓ Accepting New Clients</p>
+        }
+        else
+        {
+            <p class="not-accepting-badge">Not Currently Accepting New Clients</p>
+        }
+
+        @if (!string.IsNullOrEmpty(t.Phone))
+        {
+            <p><a href="tel:@t.Phone">@t.Phone</a></p>
+        }
+        @if (!string.IsNullOrEmpty(t.Email))
+        {
+            <p><a href="mailto:@t.Email">@t.Email</a></p>
+        }
+        @if (!string.IsNullOrEmpty(t.WebsiteUrl))
+        {
+            <p><a href="@t.WebsiteUrl" target="_blank" rel="noopener">Website</a></p>
+        }
+    </aside>
+
+    <main class="profile-main">
+        <h1>@t.FirstName @t.LastName, @t.Title</h1>
+
+        @if (!string.IsNullOrWhiteSpace(t.Bio))
+        {
+            <section class="profile-section">
+                <h2>About</h2>
+                <p>@t.Bio</p>
+            </section>
+        }
+
+        @if (t.Specialties.Any())
+        {
+            <section class="profile-section">
+                <h2>Specialties</h2>
+                <ul class="tag-list">
+                    @foreach (var s in t.Specialties) { <li>@s</li> }
+                </ul>
+            </section>
+        }
+
+        @if (t.InsuranceAccepted.Any())
+        {
+            <section class="profile-section">
+                <h2>Insurance &amp; Fees</h2>
+                <ul class="tag-list">
+                    @foreach (var ins in t.InsuranceAccepted) { <li>@ins</li> }
+                </ul>
+            </section>
+        }
+
+        @if (t.Languages.Any())
+        {
+            <section class="profile-section">
+                <h2>Languages</h2>
+                <ul class="tag-list">
+                    @foreach (var lang in t.Languages) { <li>@lang</li> }
+                </ul>
+            </section>
+        }
+
+        @if (t.OffersVirtual && t.LicensedVirtualStates.Any())
+        {
+            <section class="profile-section">
+                <h2>Virtual Sessions — Licensed States</h2>
+                <ul class="tag-list">
+                    @foreach (var s in t.LicensedVirtualStates) { <li>@s</li> }
+                </ul>
+            </section>
+        }
+
+        @if (t.OffersInPerson && t.Offices.Any())
+        {
+            <section class="profile-section">
+                <h2>Office Location@(t.Offices.Count > 1 ? "s" : "")</h2>
+                @foreach (var office in t.Offices)
+                {
+                    <partial name="_OfficeLocation" model="office" />
+                }
+            </section>
+        }
+    </main>
+</div>

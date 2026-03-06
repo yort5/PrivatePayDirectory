@@ -1,0 +1,183 @@
+@page
+@model PrivatePayDirectory.Web.Pages.Therapist.EditModel
+@{
+    ViewData["Title"] = "Edit My Profile";
+    var t = Model.Input;
+}
+
+<div class="edit-container">
+    <h1>My Therapist Profile</h1>
+
+    @if (!Model.IsVisible)
+    {
+        <div class="alert alert-info">
+            Your profile is pending admin review and is not yet visible in the directory.
+        </div>
+    }
+
+    <form method="post" id="edit-form">
+        <section class="form-section">
+            <h2>Basic Information</h2>
+            <div class="form-row">
+                <label asp-for="Input.FirstName">First Name</label>
+                <input asp-for="Input.FirstName" required />
+                <span asp-validation-for="Input.FirstName"></span>
+            </div>
+            <div class="form-row">
+                <label asp-for="Input.LastName">Last Name</label>
+                <input asp-for="Input.LastName" required />
+            </div>
+            <div class="form-row">
+                <label asp-for="Input.Title">Credentials / Title</label>
+                <input asp-for="Input.Title" placeholder="e.g. LCSW, LPC, PhD" />
+            </div>
+            <div class="form-row">
+                <label asp-for="Input.Bio">About Me</label>
+                <textarea asp-for="Input.Bio" rows="6"></textarea>
+            </div>
+            <div class="form-row">
+                <label asp-for="Input.AcceptingNewClients">
+                    <input asp-for="Input.AcceptingNewClients" type="checkbox" />
+                    Currently Accepting New Clients
+                </label>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <h2>Contact</h2>
+            <div class="form-row">
+                <label asp-for="Input.Phone">Phone</label>
+                <input asp-for="Input.Phone" type="tel" />
+            </div>
+            <div class="form-row">
+                <label asp-for="Input.Email">Contact Email</label>
+                <input asp-for="Input.Email" type="email" />
+            </div>
+            <div class="form-row">
+                <label asp-for="Input.WebsiteUrl">Website</label>
+                <input asp-for="Input.WebsiteUrl" type="url" />
+            </div>
+        </section>
+
+        <section class="form-section">
+            <h2>Profile Photo</h2>
+            @if (Model.CurrentPhotoUrl != null)
+            {
+                <img src="@Model.CurrentPhotoUrl" alt="Current photo" class="current-photo-preview" />
+            }
+            <div id="photo-upload-area">
+                <button type="button" id="btn-get-upload-url" class="btn btn-secondary"
+                        data-therapist-id="@Model.TherapistId">
+                    Upload New Photo
+                </button>
+                <span id="upload-status"></span>
+            </div>
+            <input type="hidden" asp-for="Input.ProfilePhotoKey" id="photo-key-input" />
+        </section>
+
+        <section class="form-section">
+            <h2>Virtual Sessions</h2>
+            <p>Select the states where you are licensed to provide virtual therapy.</p>
+            <div class="state-checkboxes">
+                @foreach (var state in Model.AllStates)
+                {
+                    <label class="state-check">
+                        <input type="checkbox" name="Input.LicensedVirtualStates"
+                               value="@state"
+                               checked="@(t.LicensedVirtualStates.Contains(state))" />
+                        @state
+                    </label>
+                }
+            </div>
+        </section>
+
+        <section class="form-section">
+            <h2>In-Person Offices</h2>
+            <div id="offices-container">
+                @for (int i = 0; i < t.Offices.Count; i++)
+                {
+                    <partial name="_OfficeEditor" model="@(i, t.Offices[i])" />
+                }
+            </div>
+            <button type="button" id="btn-add-office" class="btn btn-secondary">+ Add Office</button>
+        </section>
+
+        <section class="form-section">
+            <h2>Specialties</h2>
+            <div class="taxonomy-checkboxes">
+                @foreach (var sp in Model.AllSpecialties)
+                {
+                    <label>
+                        <input type="checkbox" name="Input.Specialties"
+                               value="@sp"
+                               checked="@(t.Specialties.Contains(sp))" />
+                        @sp
+                    </label>
+                }
+            </div>
+        </section>
+
+        <section class="form-section">
+            <h2>Insurance Accepted</h2>
+            <div class="taxonomy-checkboxes">
+                @foreach (var ins in Model.AllInsurance)
+                {
+                    <label>
+                        <input type="checkbox" name="Input.InsuranceAccepted"
+                               value="@ins"
+                               checked="@(t.InsuranceAccepted.Contains(ins))" />
+                        @ins
+                    </label>
+                }
+            </div>
+        </section>
+
+        <section class="form-section">
+            <h2>Languages</h2>
+            <div class="taxonomy-checkboxes">
+                @foreach (var lang in Model.AllLanguages)
+                {
+                    <label>
+                        <input type="checkbox" name="Input.Languages"
+                               value="@lang"
+                               checked="@(t.Languages.Contains(lang))" />
+                        @lang
+                    </label>
+                }
+            </div>
+        </section>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Save Profile</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+<script>
+// S3 pre-signed photo upload
+document.getElementById('btn-get-upload-url')?.addEventListener('click', async () => {
+    const status = document.getElementById('upload-status');
+    const therapistId = document.getElementById('btn-get-upload-url').dataset.therapistId;
+
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/jpeg,image/png,image/webp';
+    input.onchange = async () => {
+        const file = input.files[0];
+        if (!file) return;
+        status.textContent = 'Uploading...';
+        try {
+            const res = await fetch(`/api/photo-upload-url?therapistId=${therapistId}&contentType=${encodeURIComponent(file.type)}`);
+            const { uploadUrl, key } = await res.json();
+            await fetch(uploadUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } });
+            document.getElementById('photo-key-input').value = key;
+            status.textContent = '✓ Photo uploaded';
+        } catch {
+            status.textContent = 'Upload failed. Please try again.';
+        }
+    };
+    input.click();
+});
+</script>
+}

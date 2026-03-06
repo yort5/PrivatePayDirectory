@@ -1,0 +1,45 @@
+@page
+@model PrivatePayDirectory.Web.Pages.Admin.UsersModel
+@{
+    ViewData["Title"] = "Admin — Users";
+}
+
+<h1>Users</h1>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<table class="admin-table">
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Joined</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var u in Model.Users)
+        {
+            <tr>
+                <td>@u.Email</td>
+                <td>@u.Role</td>
+                <td>@u.CreatedAt.ToString("MM/dd/yyyy")</td>
+                <td>
+                    <form method="post">
+                        <input type="hidden" name="userId" value="@u.UserId" />
+                        <select name="role">
+                            @foreach (var role in Model.AllRoles)
+                            {
+                                <option value="@role" selected="@(u.Role.ToString() == role)">@role</option>
+                            }
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

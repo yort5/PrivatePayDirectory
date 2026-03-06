@@ -1,0 +1,9 @@
+# Build output
+bin/
+obj/
+
+# Azurite local blob/queue/table storage data
+.azurite/
+
+# User secrets & local config overrides
+appsettings.*.local.json

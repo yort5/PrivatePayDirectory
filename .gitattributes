@@ -1,0 +1,5 @@
+# Normalize line endings
+* text=auto
+
+# Vendor JS/CSS — don't touch line endings
+src/PrivatePayDirectory.Web/wwwroot/lib/** binary

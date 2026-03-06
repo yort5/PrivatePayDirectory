@@ -1,0 +1,107 @@
+@page
+@model PrivatePayDirectory.Web.Pages.DirectoryModel
+@{
+    ViewData["Title"] = "Therapist Directory";
+}
+
+<div class="directory-layout">
+    <aside class="filters">
+        <h2>Filter</h2>
+        <form method="get">
+            <div class="filter-group">
+                <label>Session Type</label>
+                <select name="sessionType" asp-items="Model.SessionTypeOptions">
+                    <option value="">Any</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>State</label>
+                <select name="state">
+                    <option value="">Any</option>
+                    @foreach (var s in Model.States)
+                    {
+                        <option value="@s" selected="@(Model.Filter.VirtualState == s || Model.Filter.OfficeState == s)">@s</option>
+                    }
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Specialty</label>
+                <select name="specialty">
+                    <option value="">Any</option>
+                    @foreach (var sp in Model.Specialties)
+                    {
+                        <option value="@sp" selected="@(Model.Filter.Specialty == sp)">@sp</option>
+                    }
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Insurance</label>
+                <select name="insurance">
+                    <option value="">Any</option>
+                    @foreach (var ins in Model.InsurancePlans)
+                    {
+                        <option value="@ins" selected="@(Model.Filter.Insurance == ins)">@ins</option>
+                    }
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Language</label>
+                <select name="language">
+                    <option value="">Any</option>
+                    @foreach (var lang in Model.Languages)
+                    {
+                        <option value="@lang" selected="@(Model.Filter.Language == lang)">@lang</option>
+                    }
+                </select>
+            </div>
+            <div class="filter-group filter-check">
+                <label>
+                    <input type="checkbox" name="acceptingClients" value="true"
+                           checked="@(Model.Filter.AcceptingNewClients == true)" />
+                    Accepting New Clients
+                </label>
+            </div>
+            <div class="filter-group">
+                <input type="text" name="name" placeholder="Search by name"
+                       value="@Model.Filter.NameContains" />
+            </div>
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+            <a href="/Directory" class="btn btn-secondary">Clear</a>
+        </form>
+    </aside>
+
+    <main class="therapist-grid">
+        <h1>Therapist Directory</h1>
+        <p>@Model.Therapists.Count therapist(s) found</p>
+
+        @foreach (var t in Model.Therapists)
+        {
+            <div class="therapist-card">
+                @if (t.ProfilePhotoKey != null)
+                {
+                    <img src="@Model.GetPhotoUrl(t.ProfilePhotoKey)" alt="@t.FirstName @t.LastName" class="card-photo" />
+                }
+                <div class="card-body">
+                    <h3><a asp-page="/Therapist/Profile" asp-route-id="@t.TherapistId">@t.FirstName @t.LastName, @t.Title</a></h3>
+                    <div class="session-badges">
+                        @if (t.OffersVirtual) { <span class="badge badge-virtual">Virtual</span> }
+                        @if (t.OffersInPerson) { <span class="badge badge-inperson">In-Person</span> }
+                    </div>
+                    @if (t.AcceptingNewClients)
+                    {
+                        <span class="badge badge-accepting">Accepting New Clients</span>
+                    }
+                    @if (t.Specialties.Any())
+                    {
+                        <p class="card-specialties">@string.Join(" · ", t.Specialties.Take(3))</p>
+                    }
+                </div>
+            </div>
+        }
+
+        @if (!Model.Therapists.Any())
+        {
+            <p class="no-results">No therapists match your filters. Try adjusting your search.</p>
+        }
+    </main>
+</div>

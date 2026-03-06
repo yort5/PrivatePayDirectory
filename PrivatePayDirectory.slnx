@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PrivatePayDirectory.Core/PrivatePayDirectory.Core.csproj" />
+    <Project Path="src/PrivatePayDirectory.Infrastructure/PrivatePayDirectory.Infrastructure.csproj" />
+    <Project Path="src/PrivatePayDirectory.Web/PrivatePayDirectory.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PrivatePayDirectory.Tests/PrivatePayDirectory.Tests.csproj" />
+  </Folder>
+</Solution>

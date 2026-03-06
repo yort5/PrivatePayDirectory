@@ -1,0 +1,35 @@
+@model (int Index, PrivatePayDirectory.Core.Models.OfficeLocation Office)
+
+<div class="office-editor" data-index="@Model.Index">
+    <h4>Office @(Model.Index + 1) <button type="button" class="btn-remove-office">Remove</button></h4>
+    <input type="hidden" name="Input.Offices[@Model.Index].OfficeId" value="@Model.Office.OfficeId" />
+    <div class="form-row">
+        <label>Label</label>
+        <input type="text" name="Input.Offices[@Model.Index].Label" value="@Model.Office.Label" placeholder="e.g. Main Office" />
+    </div>
+    <div class="form-row">
+        <label>Street</label>
+        <input type="text" name="Input.Offices[@Model.Index].Street" value="@Model.Office.Street" />
+    </div>
+    <div class="form-row">
+        <label>City</label>
+        <input type="text" name="Input.Offices[@Model.Index].City" value="@Model.Office.City" />
+    </div>
+    <div class="form-row">
+        <label>State</label>
+        <select name="Input.Offices[@Model.Index].State">
+            @foreach (var s in PrivatePayDirectory.Core.Models.Taxonomy.UnitedStates)
+            {
+                <option value="@s" selected="@(Model.Office.State == s)">@s</option>
+            }
+        </select>
+    </div>
+    <div class="form-row">
+        <label>Zip</label>
+        <input type="text" name="Input.Offices[@Model.Index].Zip" value="@Model.Office.Zip" />
+    </div>
+    <div class="form-row">
+        <label>Phone (optional)</label>
+        <input type="tel" name="Input.Offices[@Model.Index].Phone" value="@Model.Office.Phone" />
+    </div>
+</div>

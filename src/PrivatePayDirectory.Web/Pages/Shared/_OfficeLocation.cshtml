@@ -1,0 +1,34 @@
+@model PrivatePayDirectory.Core.Models.OfficeLocation
+@inject Microsoft.Extensions.Configuration.IConfiguration Config
+
+@{
+    var apiKey = Config["GoogleMaps:ApiKey"] ?? "";
+    var address = Uri.EscapeDataString($"{Model.Street}, {Model.City}, {Model.State} {Model.Zip}");
+    var embedUrl = $"https://www.google.com/maps/embed/v1/place?key={apiKey}&q={address}";
+}
+
+<div class="office-location">
+    <h3>@Model.Label</h3>
+    <address>
+        @Model.Street<br />
+        @Model.City, @Model.State @Model.Zip
+    </address>
+    @if (!string.IsNullOrEmpty(Model.Phone))
+    {
+        <p><a href="tel:@Model.Phone">@Model.Phone</a></p>
+    }
+    @if (!string.IsNullOrEmpty(apiKey))
+    {
+        <div class="map-embed">
+            <iframe
+                loading="lazy"
+                allowfullscreen
+                referrerpolicy="no-referrer-when-downgrade"
+                src="@embedUrl"
+                width="100%"
+                height="300"
+                style="border:0;">
+            </iframe>
+        </div>
+    }
+</div>

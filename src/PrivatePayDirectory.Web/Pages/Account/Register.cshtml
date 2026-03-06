@@ -1,0 +1,37 @@
+@page
+@model PrivatePayDirectory.Web.Pages.Account.RegisterModel
+@{
+    ViewData["Title"] = "Create Account";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-4">
+        <h1>Create Account</h1>
+
+        @if (Model.ErrorMessage != null)
+        {
+            <div class="alert alert-danger">@Model.ErrorMessage</div>
+        }
+
+        <form method="post">
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label">Email</label>
+                <input asp-for="Email" class="form-control" type="email" autocomplete="username" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label">Password</label>
+                <input asp-for="Password" class="form-control" type="password" autocomplete="new-password" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
+                <input asp-for="ConfirmPassword" class="form-control" type="password" autocomplete="new-password" />
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Create Account</button>
+        </form>
+
+        <hr />
+        <p class="text-center">
+            Already have an account? <a asp-page="/Account/Login">Sign in</a>
+        </p>
+    </div>
+</div>

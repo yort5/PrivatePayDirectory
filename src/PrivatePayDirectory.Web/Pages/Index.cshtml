@@ -4,7 +4,12 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="w-full bg-gradient-to-br from-[#4a7c59] to-[#3d5244] py-24 px-6">
+    <div class="max-w-3xl mx-auto text-center text-white">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6 leading-tight">Find a Private-Pay Therapist</h1>
+        <p class="text-lg md:text-xl text-white/80 mb-10">Browse independent therapists offering virtual and in-person care — no insurance required.</p>
+        <a asp-page="/Directory" class="inline-block px-8 py-4 bg-white text-primary font-semibold rounded-xl shadow hover:shadow-md hover:bg-slate-50 transition-all">
+            Browse the Directory
+        </a>
+    </div>
+</section>

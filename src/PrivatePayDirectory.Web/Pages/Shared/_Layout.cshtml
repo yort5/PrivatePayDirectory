@@ -5,80 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Private Pay Directory</title>
     <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#4a7c59",
+                    },
+                    fontFamily: {
+                        display: ["Manrope", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/PrivatePayDirectory.Web.styles.css" asp-append-version="true" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">Private Pay Directory</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Directory">Directory</a>
-                        </li>
-                        @if (User.IsInRole("Administrator"))
+<body class="bg-[#f8faf9] text-slate-900 min-h-screen">
+    <header class="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-6">
+            <nav class="flex items-center justify-between h-16">
+                <a asp-area="" asp-page="/Index" class="flex items-center gap-2 font-bold text-lg text-primary no-underline">
+                    <span class="material-symbols-outlined text-primary">psychology</span>
+                    Private Pay Directory
+                </a>
+                <div class="flex items-center gap-6">
+                    <a asp-area="" asp-page="/Directory" class="text-slate-600 hover:text-primary font-medium transition-colors">Directory</a>
+                    @if (User.IsInRole("Administrator"))
+                    {
+                        <a asp-area="" asp-page="/Admin/Therapists" class="text-slate-600 hover:text-primary font-medium transition-colors">Admin</a>
+                    }
+                </div>
+                <div class="flex items-center gap-3">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        @if (User.IsInRole("Therapist"))
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-page="/Admin/Therapists">Admin</a>
-                            </li>
-                        }
-                    </ul>
-                    <ul class="navbar-nav">
-                        @if (User.Identity?.IsAuthenticated == true)
-                        {
-                            @if (User.IsInRole("Therapist"))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-page="/Therapist/Edit">My Profile</a>
-                                </li>
-                            }
-                            else
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-area="" asp-page="/Therapist/Register">Join as Therapist</a>
-                                </li>
-                            }
-                            <li class="nav-item">
-                                <form method="post" asp-page="/Account/Logout" style="display:inline">
-                                    <button type="submit" class="nav-link btn btn-link text-dark">Sign Out</button>
-                                </form>
-                            </li>
+                            <a asp-area="" asp-page="/Therapist/Edit" class="text-slate-600 hover:text-primary font-medium transition-colors">My Profile</a>
                         }
                         else
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-page="/Account/Login">Sign In</a>
-                            </li>
+                            <a asp-area="" asp-page="/Therapist/Register" class="text-slate-600 hover:text-primary font-medium transition-colors">Join as Therapist</a>
                         }
-                    </ul>
+                        <form method="post" action="/Account/Logout" style="display:inline">
+                            <button type="submit" class="text-slate-600 hover:text-primary font-medium transition-colors bg-transparent border-0 cursor-pointer p-0">Sign Out</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <a asp-page="/Account/Login" class="px-4 py-2 rounded-lg border border-primary text-primary font-medium hover:bg-primary/5 transition-colors">Sign In</a>
+                        <a asp-page="/Account/Register" class="px-4 py-2 rounded-lg bg-primary text-white font-medium hover:bg-primary/90 transition-colors">Register</a>
+                    }
                 </div>
-            </div>
-        </nav>
+            </nav>
+        </div>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
+    <main role="main">
+        @RenderBody()
+    </main>
+
+    <footer class="border-t border-slate-200 mt-16 py-8">
+        <div class="max-w-7xl mx-auto px-6 text-slate-500 text-sm">
             &copy; 2026 - Private Pay Directory
         </div>
     </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)

@@ -4,29 +4,26 @@
     ViewData["Title"] = "Therapist Directory";
 }
 
-<div class="directory-layout">
-    <aside class="filters">
-        <h2>Filter</h2>
-        <form method="get">
-            <div class="filter-group">
-                <label>Session Type</label>
-                <select name="sessionType" asp-items="Model.SessionTypeOptions">
+<div class="max-w-7xl mx-auto px-6 py-10 flex gap-8 items-start">
+    <!-- Sidebar Filters -->
+    <aside class="w-72 flex-shrink-0 bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+        <div class="flex items-center justify-between mb-5">
+            <h2 class="font-semibold text-slate-800 text-base">Filter Results</h2>
+            <a href="/Directory" class="text-sm text-primary hover:underline">Clear</a>
+        </div>
+        <form method="get" class="space-y-5">
+            <!-- Session Mode -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Session Mode</label>
+                <select name="sessionType" asp-items="Model.SessionTypeOptions" class="w-full rounded-lg border-slate-300 text-sm focus:ring-primary focus:border-primary">
                     <option value="">Any</option>
                 </select>
             </div>
-            <div class="filter-group">
-                <label>State</label>
-                <select name="state">
-                    <option value="">Any</option>
-                    @foreach (var s in Model.States)
-                    {
-                        <option value="@s" selected="@(Model.Filter.VirtualState == s || Model.Filter.OfficeState == s)">@s</option>
-                    }
-                </select>
-            </div>
-            <div class="filter-group">
-                <label>Specialty</label>
-                <select name="specialty">
+
+            <!-- Specialty -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Specialty</label>
+                <select name="specialty" class="w-full rounded-lg border-slate-300 text-sm focus:ring-primary focus:border-primary">
                     <option value="">Any</option>
                     @foreach (var sp in Model.Specialties)
                     {
@@ -34,9 +31,11 @@
                     }
                 </select>
             </div>
-            <div class="filter-group">
-                <label>Insurance</label>
-                <select name="insurance">
+
+            <!-- Insurance -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Insurance</label>
+                <select name="insurance" class="w-full rounded-lg border-slate-300 text-sm focus:ring-primary focus:border-primary">
                     <option value="">Any</option>
                     @foreach (var ins in Model.InsurancePlans)
                     {
@@ -44,9 +43,11 @@
                     }
                 </select>
             </div>
-            <div class="filter-group">
-                <label>Language</label>
-                <select name="language">
+
+            <!-- Language -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Language</label>
+                <select name="language" class="w-full rounded-lg border-slate-300 text-sm focus:ring-primary focus:border-primary">
                     <option value="">Any</option>
                     @foreach (var lang in Model.Languages)
                     {
@@ -54,54 +55,101 @@
                     }
                 </select>
             </div>
-            <div class="filter-group filter-check">
-                <label>
+
+            <!-- Accepting New Clients -->
+            <div>
+                <label class="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
                     <input type="checkbox" name="acceptingClients" value="true"
-                           checked="@(Model.Filter.AcceptingNewClients == true)" />
+                           checked="@(Model.Filter.AcceptingNewClients == true)"
+                           class="rounded border-slate-300 text-primary focus:ring-primary" />
                     Accepting New Clients
                 </label>
             </div>
-            <div class="filter-group">
+
+            <!-- Name Search -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Name</label>
                 <input type="text" name="name" placeholder="Search by name"
-                       value="@Model.Filter.NameContains" />
+                       value="@Model.Filter.NameContains"
+                       class="w-full rounded-lg border-slate-300 text-sm focus:ring-primary focus:border-primary" />
             </div>
-            <button type="submit" class="btn btn-primary">Apply Filters</button>
-            <a href="/Directory" class="btn btn-secondary">Clear</a>
+
+            <button type="submit" class="w-full py-2.5 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition-colors">
+                Apply Filters
+            </button>
         </form>
     </aside>
 
-    <main class="therapist-grid">
-        <h1>Therapist Directory</h1>
-        <p>@Model.Therapists.Count therapist(s) found</p>
+    <!-- Main content -->
+    <div class="flex-1 min-w-0">
+        <div class="mb-6">
+            <h2 class="text-2xl font-bold text-slate-900">Therapist Directory</h2>
+            <p class="text-slate-500 mt-1">@Model.Therapists.Count therapist(s) found</p>
+        </div>
 
-        @foreach (var t in Model.Therapists)
+        @if (Model.Therapists.Any())
         {
-            <div class="therapist-card">
-                @if (t.ProfilePhotoKey != null)
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                @foreach (var t in Model.Therapists)
                 {
-                    <img src="@Model.GetPhotoUrl(t.ProfilePhotoKey)" alt="@t.FirstName @t.LastName" class="card-photo" />
-                }
-                <div class="card-body">
-                    <h3><a asp-page="/Therapist/Profile" asp-route-id="@t.TherapistId">@t.FirstName @t.LastName, @t.Title</a></h3>
-                    <div class="session-badges">
-                        @if (t.OffersVirtual) { <span class="badge badge-virtual">Virtual</span> }
-                        @if (t.OffersInPerson) { <span class="badge badge-inperson">In-Person</span> }
+                    <div class="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-row overflow-hidden">
+                        @if (t.ProfilePhotoKey != null)
+                        {
+                            <img src="@Model.GetPhotoUrl(t.ProfilePhotoKey)" alt="@t.FirstName @t.LastName"
+                                 class="w-40 h-48 object-cover flex-shrink-0 rounded-l-xl" />
+                        }
+                        else
+                        {
+                            <img src="~/images/default-profile.svg" alt="@t.FirstName @t.LastName"
+                                 class="w-40 h-48 object-cover flex-shrink-0 rounded-l-xl" />
+                        }
+                        <div class="p-5 flex flex-col flex-1 min-w-0">
+                            <a asp-page="/Therapist/Profile" asp-route-id="@t.TherapistId"
+                               class="font-bold text-slate-900 hover:text-primary transition-colors truncate">
+                                @t.FirstName @t.LastName
+                            </a>
+                            <p class="text-primary text-xs font-medium mt-0.5">@t.Title</p>
+                            @if (!string.IsNullOrWhiteSpace(t.Bio))
+                            {
+                                <p class="text-slate-500 text-sm mt-2 line-clamp-2">@t.Bio</p>
+                            }
+                            @if (t.Specialties.Any())
+                            {
+                                <div class="flex flex-wrap gap-1 mt-3">
+                                    @foreach (var sp in t.Specialties.Take(3))
+                                    {
+                                        <span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded-full">@sp</span>
+                                    }
+                                </div>
+                            }
+                            <div class="flex items-center justify-between mt-auto pt-3">
+                                <div class="flex items-center gap-2 text-slate-400">
+                                    @if (t.OffersVirtual)
+                                    {
+                                        <span class="material-symbols-outlined text-base" title="Virtual">videocam</span>
+                                    }
+                                    @if (t.OffersInPerson)
+                                    {
+                                        <span class="material-symbols-outlined text-base" title="In-Person">person</span>
+                                    }
+                                </div>
+                                <a asp-page="/Therapist/Profile" asp-route-id="@t.TherapistId"
+                                   class="px-3 py-1.5 rounded-lg border border-primary text-primary text-xs font-semibold hover:bg-primary/5 transition-colors">
+                                    View Profile
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                    @if (t.AcceptingNewClients)
-                    {
-                        <span class="badge badge-accepting">Accepting New Clients</span>
-                    }
-                    @if (t.Specialties.Any())
-                    {
-                        <p class="card-specialties">@string.Join(" · ", t.Specialties.Take(3))</p>
-                    }
-                </div>
+                }
             </div>
         }
-
-        @if (!Model.Therapists.Any())
+        else
         {
-            <p class="no-results">No therapists match your filters. Try adjusting your search.</p>
+            <div class="text-center py-20 text-slate-400">
+                <span class="material-symbols-outlined text-5xl mb-3 block">search_off</span>
+                <p class="text-lg font-medium">No therapists match your filters.</p>
+                <p class="text-sm mt-1">Try adjusting your search.</p>
+            </div>
         }
-    </main>
+    </div>
 </div>

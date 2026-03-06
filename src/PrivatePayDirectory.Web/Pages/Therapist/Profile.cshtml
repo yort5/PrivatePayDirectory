@@ -5,105 +5,175 @@
     var t = Model.Therapist;
 }
 
-<div class="profile-layout">
-    <aside class="profile-sidebar">
-        @if (t.ProfilePhotoKey != null)
-        {
-            <img src="@Model.PhotoUrl" alt="@t.FirstName @t.LastName" class="profile-photo" />
-        }
-        else
-        {
-            <img src="~/images/default-profile.svg" alt="No photo available" class="profile-photo" />
-        }
-
-        <div class="session-badges">
-            @if (t.OffersVirtual) { <span class="badge badge-virtual">Virtual</span> }
-            @if (t.OffersInPerson) { <span class="badge badge-inperson">In-Person</span> }
+<div class="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-3 gap-10">
+    <!-- Main content (left) -->
+    <div class="lg:col-span-2 space-y-6">
+        <!-- Hero card -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-8">
+            <div class="flex gap-6 items-start">
+                @if (t.ProfilePhotoKey != null)
+                {
+                    <img src="@Model.PhotoUrl" alt="@t.FirstName @t.LastName"
+                         class="w-40 h-40 object-cover rounded-2xl flex-shrink-0" />
+                }
+                else
+                {
+                    <img src="~/images/default-profile.svg" alt="No photo available"
+                         class="w-40 h-40 object-cover rounded-2xl flex-shrink-0" />
+                }
+                <div class="flex-1 min-w-0">
+                    <h1 class="text-2xl font-bold text-slate-900">@t.FirstName @t.LastName</h1>
+                    <p class="text-primary font-medium mt-1">@t.Title</p>
+                    <div class="flex flex-wrap gap-2 mt-4">
+                        @if (t.OffersVirtual)
+                        {
+                            <span class="flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full">
+                                <span class="material-symbols-outlined text-sm">videocam</span> Virtual
+                            </span>
+                        }
+                        @if (t.OffersInPerson)
+                        {
+                            <span class="flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 text-xs font-medium rounded-full">
+                                <span class="material-symbols-outlined text-sm">person</span> In-Person
+                            </span>
+                        }
+                        @if (t.AcceptingNewClients)
+                        {
+                            <span class="flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full">
+                                <span class="material-symbols-outlined text-sm">check_circle</span> Accepting New Clients
+                            </span>
+                        }
+                    </div>
+                </div>
+            </div>
         </div>
 
-        @if (t.AcceptingNewClients)
-        {
-            <p class="accepting-badge">✓ Accepting New Clients</p>
-        }
-        else
-        {
-            <p class="not-accepting-badge">Not Currently Accepting New Clients</p>
-        }
-
-        @if (!string.IsNullOrEmpty(t.Phone))
-        {
-            <p><a href="tel:@t.Phone">@t.Phone</a></p>
-        }
-        @if (!string.IsNullOrEmpty(t.Email))
-        {
-            <p><a href="mailto:@t.Email">@t.Email</a></p>
-        }
-        @if (!string.IsNullOrEmpty(t.WebsiteUrl))
-        {
-            <p><a href="@t.WebsiteUrl" target="_blank" rel="noopener">Website</a></p>
-        }
-    </aside>
-
-    <main class="profile-main">
-        <h1>@t.FirstName @t.LastName, @t.Title</h1>
-
+        <!-- Bio -->
         @if (!string.IsNullOrWhiteSpace(t.Bio))
         {
-            <section class="profile-section">
-                <h2>About</h2>
-                <p>@t.Bio</p>
-            </section>
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-8">
+                <h2 class="text-lg font-semibold text-slate-900 mb-3">About</h2>
+                <p class="text-slate-600 leading-relaxed">@t.Bio</p>
+            </div>
         }
 
+        <!-- Specialties -->
         @if (t.Specialties.Any())
         {
-            <section class="profile-section">
-                <h2>Specialties</h2>
-                <ul class="tag-list">
-                    @foreach (var s in t.Specialties) { <li>@s</li> }
-                </ul>
-            </section>
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-8">
+                <h2 class="text-lg font-semibold text-slate-900 mb-4">Specialties</h2>
+                <div class="flex flex-wrap gap-2">
+                    @foreach (var s in t.Specialties)
+                    {
+                        <span class="px-3 py-1.5 bg-primary/10 text-primary text-sm font-medium rounded-full">@s</span>
+                    }
+                </div>
+            </div>
         }
 
-        @if (t.InsuranceAccepted.Any())
-        {
-            <section class="profile-section">
-                <h2>Insurance &amp; Fees</h2>
-                <ul class="tag-list">
-                    @foreach (var ins in t.InsuranceAccepted) { <li>@ins</li> }
-                </ul>
-            </section>
-        }
-
+        <!-- Languages -->
         @if (t.Languages.Any())
         {
-            <section class="profile-section">
-                <h2>Languages</h2>
-                <ul class="tag-list">
-                    @foreach (var lang in t.Languages) { <li>@lang</li> }
-                </ul>
-            </section>
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-8">
+                <h2 class="text-lg font-semibold text-slate-900 mb-4">Languages</h2>
+                <div class="flex flex-wrap gap-2">
+                    @foreach (var lang in t.Languages)
+                    {
+                        <span class="px-3 py-1.5 bg-slate-100 text-slate-700 text-sm rounded-full">@lang</span>
+                    }
+                </div>
+            </div>
         }
 
+        <!-- Insurance -->
+        @if (t.InsuranceAccepted.Any())
+        {
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-8">
+                <h2 class="text-lg font-semibold text-slate-900 mb-4">Insurance &amp; Fees</h2>
+                <div class="flex flex-wrap gap-2">
+                    @foreach (var ins in t.InsuranceAccepted)
+                    {
+                        <span class="px-3 py-1.5 bg-slate-100 text-slate-700 text-sm rounded-full">@ins</span>
+                    }
+                </div>
+            </div>
+        }
+
+        <!-- Virtual States -->
         @if (t.OffersVirtual && t.LicensedVirtualStates.Any())
         {
-            <section class="profile-section">
-                <h2>Virtual Sessions — Licensed States</h2>
-                <ul class="tag-list">
-                    @foreach (var s in t.LicensedVirtualStates) { <li>@s</li> }
-                </ul>
-            </section>
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-8">
+                <h2 class="text-lg font-semibold text-slate-900 mb-4">Virtual Sessions — Licensed States</h2>
+                <div class="flex flex-wrap gap-2">
+                    @foreach (var s in t.LicensedVirtualStates)
+                    {
+                        <span class="px-3 py-1.5 bg-slate-100 text-slate-700 text-sm rounded-full">@s</span>
+                    }
+                </div>
+            </div>
         }
 
+        <!-- Office Locations -->
         @if (t.OffersInPerson && t.Offices.Any())
         {
-            <section class="profile-section">
-                <h2>Office Location@(t.Offices.Count > 1 ? "s" : "")</h2>
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-8">
+                <h2 class="text-lg font-semibold text-slate-900 mb-4">Office Location@(t.Offices.Count > 1 ? "s" : "")</h2>
                 @foreach (var office in t.Offices)
                 {
                     <partial name="_OfficeLocation" model="office" />
                 }
-            </section>
+            </div>
         }
-    </main>
+    </div>
+
+    <!-- Right sidebar -->
+    <div class="lg:col-span-1">
+        <div class="sticky top-24 space-y-4">
+            <!-- Contact card -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+                <h3 class="font-semibold text-slate-900 mb-4">Contact</h3>
+                <div class="space-y-3">
+                    @if (!string.IsNullOrEmpty(t.Phone))
+                    {
+                        <a href="tel:@t.Phone" class="flex items-center gap-3 text-slate-600 hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined text-slate-400">phone</span>
+                            <span class="text-sm">@t.Phone</span>
+                        </a>
+                    }
+                    @if (!string.IsNullOrEmpty(t.Email))
+                    {
+                        <a href="mailto:@t.Email" class="flex items-center gap-3 text-slate-600 hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined text-slate-400">mail</span>
+                            <span class="text-sm">@t.Email</span>
+                        </a>
+                    }
+                    @if (!string.IsNullOrEmpty(t.WebsiteUrl))
+                    {
+                        <a href="@t.WebsiteUrl" target="_blank" rel="noopener" class="flex items-center gap-3 text-slate-600 hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined text-slate-400">language</span>
+                            <span class="text-sm">Website</span>
+                        </a>
+                    }
+                </div>
+            </div>
+
+            <!-- Accepting status -->
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6">
+                @if (t.AcceptingNewClients)
+                {
+                    <div class="flex items-center gap-2 text-primary">
+                        <span class="material-symbols-outlined">check_circle</span>
+                        <span class="font-medium text-sm">Accepting New Clients</span>
+                    </div>
+                }
+                else
+                {
+                    <div class="flex items-center gap-2 text-slate-500">
+                        <span class="material-symbols-outlined">cancel</span>
+                        <span class="font-medium text-sm">Not Currently Accepting</span>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
 </div>

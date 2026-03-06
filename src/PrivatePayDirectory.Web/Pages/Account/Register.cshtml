@@ -4,34 +4,39 @@
     ViewData["Title"] = "Create Account";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-4">
-        <h1>Create Account</h1>
+<div class="max-w-md mx-auto mt-16 px-4">
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-8">
+        <h1 class="text-2xl font-bold text-slate-900 mb-6">Create Account</h1>
 
         @if (Model.ErrorMessage != null)
         {
-            <div class="alert alert-danger">@Model.ErrorMessage</div>
+            <div class="mb-4 px-4 py-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">@Model.ErrorMessage</div>
         }
 
-        <form method="post">
-            <div class="mb-3">
-                <label asp-for="Email" class="form-label">Email</label>
-                <input asp-for="Email" class="form-control" type="email" autocomplete="username" />
+        <form method="post" class="space-y-4">
+            <div>
+                <label asp-for="Email" class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                <input asp-for="Email" type="email" autocomplete="username"
+                       class="w-full rounded-lg border-slate-300 text-sm focus:ring-primary focus:border-primary" />
             </div>
-            <div class="mb-3">
-                <label asp-for="Password" class="form-label">Password</label>
-                <input asp-for="Password" class="form-control" type="password" autocomplete="new-password" />
+            <div>
+                <label asp-for="Password" class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                <input asp-for="Password" type="password" autocomplete="new-password"
+                       class="w-full rounded-lg border-slate-300 text-sm focus:ring-primary focus:border-primary" />
             </div>
-            <div class="mb-3">
-                <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
-                <input asp-for="ConfirmPassword" class="form-control" type="password" autocomplete="new-password" />
+            <div>
+                <label asp-for="ConfirmPassword" class="block text-sm font-medium text-slate-700 mb-1">Confirm Password</label>
+                <input asp-for="ConfirmPassword" type="password" autocomplete="new-password"
+                       class="w-full rounded-lg border-slate-300 text-sm focus:ring-primary focus:border-primary" />
             </div>
-            <button type="submit" class="btn btn-primary w-100">Create Account</button>
+            <button type="submit" class="w-full py-2.5 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition-colors">
+                Create Account
+            </button>
         </form>
 
-        <hr />
-        <p class="text-center">
-            Already have an account? <a asp-page="/Account/Login">Sign in</a>
+        <hr class="my-6 border-slate-200" />
+        <p class="text-center text-sm text-slate-500">
+            Already have an account? <a asp-page="/Account/Login" class="text-primary font-medium hover:underline">Sign in</a>
         </p>
     </div>
 </div>

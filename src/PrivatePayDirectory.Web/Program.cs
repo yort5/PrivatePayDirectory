@@ -31,7 +31,7 @@ builder.Services.AddAuthorizationBuilder()
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizeFolder("/Admin", Policies.RequireAdmin);
-    options.Conventions.AuthorizePage("/Therapist/Edit", Policies.RequireTherapist);
+    options.Conventions.AuthorizePage("/Therapist/Edit", Policies.RequireAuthenticated);
     options.Conventions.AuthorizePage("/Therapist/Register", Policies.RequireAuthenticated);
 });
 
@@ -68,6 +68,25 @@ app.MapPost("/Account/Logout", async (HttpContext ctx) =>
     await ctx.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
     return Results.Redirect("/");
 }).DisableAntiforgery();
+
+// Minimal API: server-side photo upload (avoids CORS issues with Azurite in dev)
+app.MapPost("/api/photo-upload", async (
+    IFormFile file,
+    string therapistId,
+    IPhotoService photoService,
+    HttpContext ctx) =>
+{
+    if (!ctx.User.Identity?.IsAuthenticated ?? true)
+        return Results.Unauthorized();
+
+    var therapistIdClaim = ctx.User.FindFirst("TherapistId")?.Value;
+    if (therapistIdClaim != therapistId && !ctx.User.IsInRole("Administrator"))
+        return Results.Forbid();
+
+    using var stream = file.OpenReadStream();
+    var key = await photoService.UploadPhotoAsync(therapistId, stream, file.ContentType);
+    return Results.Ok(new { key });
+}).RequireAuthorization().DisableAntiforgery();
 
 // Minimal API: generate pre-signed upload URL for therapist photo
 app.MapGet("/api/photo-upload-url", async (
@@ -127,7 +146,7 @@ static async Task SeedDevTherapistsAsync(IServiceProvider services)
             FirstName = "Alice", LastName = "Morgan", Title = "LCSW",
             Bio = "Specializing in anxiety and depression with a compassionate, evidence-based approach.",
             Specialties = ["Anxiety", "Depression", "Trauma & PTSD"],
-            InsuranceAccepted = ["Out-of-Pocket / Private Pay"],
+            InsuranceAccepted = ["Private Pay"],
             Languages = ["English"],
             LicensedVirtualStates = ["TX", "CA", "NY"],
             Offices = [],
@@ -142,7 +161,7 @@ static async Task SeedDevTherapistsAsync(IServiceProvider services)
             FirstName = "David", LastName = "Chen", Title = "LPC",
             Bio = "Helping individuals and couples navigate life transitions and relationship challenges.",
             Specialties = ["Couples Therapy", "Life Transitions", "Stress Management"],
-            InsuranceAccepted = ["Out-of-Pocket / Private Pay"],
+            InsuranceAccepted = ["Private Pay"],
             Languages = ["English", "Mandarin"],
             LicensedVirtualStates = [],
             Offices =
@@ -164,7 +183,7 @@ static async Task SeedDevTherapistsAsync(IServiceProvider services)
             FirstName = "Maria", LastName = "Gutierrez", Title = "PhD",
             Bio = "Bilingual psychologist offering culturally sensitive care for adults and adolescents.",
             Specialties = ["Anxiety", "Cultural & Identity Issues", "Adolescents"],
-            InsuranceAccepted = ["Out-of-Pocket / Private Pay"],
+            InsuranceAccepted = ["Private Pay"],
             Languages = ["English", "Spanish"],
             LicensedVirtualStates = ["TX", "FL"],
             Offices =
@@ -186,7 +205,7 @@ static async Task SeedDevTherapistsAsync(IServiceProvider services)
             FirstName = "James", LastName = "Okafor", Title = "LMFT",
             Bio = "Marriage and family therapist focused on building resilience and healthy communication.",
             Specialties = ["Couples Therapy", "Family Therapy", "Grief & Loss"],
-            InsuranceAccepted = ["Out-of-Pocket / Private Pay"],
+            InsuranceAccepted = ["Private Pay"],
             Languages = ["English"],
             LicensedVirtualStates = ["NY", "NJ"],
             Offices = [],
@@ -201,7 +220,7 @@ static async Task SeedDevTherapistsAsync(IServiceProvider services)
             FirstName = "Sarah", LastName = "Patel", Title = "LCSW",
             Bio = "Trauma-informed therapist with a focus on EMDR and somatic approaches.",
             Specialties = ["Trauma & PTSD", "LGBTQ+ Issues", "Anxiety"],
-            InsuranceAccepted = ["Out-of-Pocket / Private Pay"],
+            InsuranceAccepted = ["Private Pay"],
             Languages = ["English", "Hindi"],
             LicensedVirtualStates = ["CA", "WA", "OR"],
             Offices =
@@ -223,7 +242,7 @@ static async Task SeedDevTherapistsAsync(IServiceProvider services)
             FirstName = "Robert", LastName = "Kim", Title = "PsyD",
             Bio = "Specializing in men's mental health, performance anxiety, and career stress.",
             Specialties = ["Men's Issues", "Anxiety", "Stress Management"],
-            InsuranceAccepted = ["Out-of-Pocket / Private Pay"],
+            InsuranceAccepted = ["Private Pay"],
             Languages = ["English", "Korean"],
             LicensedVirtualStates = ["CA"],
             Offices =

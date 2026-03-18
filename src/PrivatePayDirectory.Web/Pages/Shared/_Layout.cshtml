@@ -47,11 +47,11 @@
                 <div class="flex items-center gap-3">
                     @if (User.Identity?.IsAuthenticated == true)
                     {
-                        @if (User.IsInRole("Therapist"))
+                        @if (User.FindFirst("TherapistId") != null)
                         {
                             <a asp-area="" asp-page="/Therapist/Edit" class="text-slate-600 hover:text-primary font-medium transition-colors">My Profile</a>
                         }
-                        else
+                        else if (!User.IsInRole("Administrator"))
                         {
                             <a asp-area="" asp-page="/Therapist/Register" class="text-slate-600 hover:text-primary font-medium transition-colors">Join as Therapist</a>
                         }

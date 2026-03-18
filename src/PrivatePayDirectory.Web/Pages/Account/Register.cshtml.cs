@@ -12,6 +12,11 @@ namespace PrivatePayDirectory.Web.Pages.Account;
 
 public class RegisterModel(IUserRepository userRepository, IPasswordHasher<AppUser> passwordHasher) : PageModel
 {
+    [BindProperty(SupportsGet = true)]
+    public string ReturnUrl { get; set; } = "/";
+
+    [BindProperty] public string FirstName { get; set; } = string.Empty;
+    [BindProperty] public string LastName { get; set; } = string.Empty;
     [BindProperty] public string Email { get; set; } = string.Empty;
     [BindProperty] public string Password { get; set; } = string.Empty;
     [BindProperty] public string ConfirmPassword { get; set; } = string.Empty;
@@ -21,12 +26,18 @@ public class RegisterModel(IUserRepository userRepository, IPasswordHasher<AppUs
     public IActionResult OnGet()
     {
         if (User.Identity?.IsAuthenticated == true)
-            return RedirectToPage("/Index");
+            return LocalRedirect(ReturnUrl);
         return Page();
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (string.IsNullOrWhiteSpace(FirstName) || string.IsNullOrWhiteSpace(LastName))
+        {
+            ErrorMessage = "First and last name are required.";
+            return Page();
+        }
+
         if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
         {
             ErrorMessage = "Email and password are required.";
@@ -56,16 +67,19 @@ public class RegisterModel(IUserRepository userRepository, IPasswordHasher<AppUs
         {
             UserId = Guid.NewGuid().ToString(),
             Email = Email,
+            FirstName = FirstName.Trim(),
+            LastName = LastName.Trim(),
             Role = UserRole.Standard,
         };
         user.PasswordHash = passwordHasher.HashPassword(user, Password);
         await userRepository.SaveAsync(user);
 
-        // Sign in immediately after registration
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, user.UserId),
             new(ClaimTypes.Email, user.Email),
+            new(ClaimTypes.GivenName, user.FirstName!),
+            new(ClaimTypes.Surname, user.LastName!),
             new(ClaimTypes.Role, user.Role.ToString()),
         };
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -74,6 +88,6 @@ public class RegisterModel(IUserRepository userRepository, IPasswordHasher<AppUs
             new ClaimsPrincipal(identity),
             new AuthenticationProperties { IsPersistent = true });
 
-        return RedirectToPage("/Index");
+        return LocalRedirect(ReturnUrl);
     }
 }

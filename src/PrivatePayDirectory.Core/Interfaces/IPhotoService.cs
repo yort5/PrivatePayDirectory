@@ -2,6 +2,9 @@ namespace PrivatePayDirectory.Core.Interfaces;
 
 public interface IPhotoService
 {
+    /// <summary>Uploads a photo stream server-side and returns the blob key.</summary>
+    Task<string> UploadPhotoAsync(string therapistId, Stream content, string contentType);
+
     /// <summary>Generates a pre-signed PUT URL for the client to upload a photo directly to S3.</summary>
     Task<string> GenerateUploadUrlAsync(string therapistId, string contentType);
 

@@ -1,0 +1,22 @@
+@page
+@model PrivatePayDirectory.Web.Pages.Account.AccessDeniedModel
+@{
+    ViewData["Title"] = "Access Denied";
+}
+
+<div class="max-w-lg mx-auto px-4 py-20 text-center">
+    <span class="material-symbols-outlined text-5xl text-slate-300">lock</span>
+    <h1 class="text-2xl font-bold text-slate-900 mt-4">Access Denied</h1>
+    <p class="text-slate-500 mt-2">You don't have permission to view that page.</p>
+    <div class="mt-8 flex justify-center gap-3">
+        <a href="/" class="px-5 py-2.5 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition-colors text-sm">
+            Go Home
+        </a>
+        @if (!User.Identity?.IsAuthenticated ?? true)
+        {
+            <a asp-page="/Account/Login" class="px-5 py-2.5 bg-white border border-slate-300 text-slate-700 font-medium rounded-lg hover:bg-slate-50 transition-colors text-sm">
+                Sign In
+            </a>
+        }
+    </div>
+</div>

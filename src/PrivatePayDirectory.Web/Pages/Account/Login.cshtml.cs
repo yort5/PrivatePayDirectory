@@ -55,6 +55,10 @@ public class LoginModel(IUserRepository userRepository, IPasswordHasher<AppUser>
             new(ClaimTypes.Email, user.Email),
             new(ClaimTypes.Role, user.Role.ToString()),
         };
+        if (!string.IsNullOrEmpty(user.FirstName))
+            claims.Add(new Claim(ClaimTypes.GivenName, user.FirstName));
+        if (!string.IsNullOrEmpty(user.LastName))
+            claims.Add(new Claim(ClaimTypes.Surname, user.LastName));
         if (user.TherapistId != null)
             claims.Add(new Claim("TherapistId", user.TherapistId));
 

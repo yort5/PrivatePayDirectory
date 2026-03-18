@@ -1,35 +1,61 @@
 @model (int Index, PrivatePayDirectory.Core.Models.OfficeLocation Office)
 
-<div class="office-editor" data-index="@Model.Index">
-    <h4>Office @(Model.Index + 1) <button type="button" class="btn-remove-office">Remove</button></h4>
-    <input type="hidden" name="Input.Offices[@Model.Index].OfficeId" value="@Model.Office.OfficeId" />
-    <div class="form-row">
-        <label>Label</label>
-        <input type="text" name="Input.Offices[@Model.Index].Label" value="@Model.Office.Label" placeholder="e.g. Main Office" />
+<div class="office-block bg-slate-50 rounded-lg border border-slate-200 p-4">
+    <div class="flex items-center justify-between mb-3">
+        <span class="office-number text-sm font-semibold text-slate-700">Office @(Model.Index + 1)</span>
+        <button type="button" data-action="remove-office"
+                class="text-sm text-red-500 hover:text-red-700 hover:underline">Remove</button>
     </div>
-    <div class="form-row">
-        <label>Street</label>
-        <input type="text" name="Input.Offices[@Model.Index].Street" value="@Model.Office.Street" />
-    </div>
-    <div class="form-row">
-        <label>City</label>
-        <input type="text" name="Input.Offices[@Model.Index].City" value="@Model.Office.City" />
-    </div>
-    <div class="form-row">
-        <label>State</label>
-        <select name="Input.Offices[@Model.Index].State">
-            @foreach (var s in PrivatePayDirectory.Core.Models.Taxonomy.UnitedStates)
-            {
-                <option value="@s" selected="@(Model.Office.State == s)">@s</option>
-            }
-        </select>
-    </div>
-    <div class="form-row">
-        <label>Zip</label>
-        <input type="text" name="Input.Offices[@Model.Index].Zip" value="@Model.Office.Zip" />
-    </div>
-    <div class="form-row">
-        <label>Phone (optional)</label>
-        <input type="tel" name="Input.Offices[@Model.Index].Phone" value="@Model.Office.Phone" />
+    <input type="hidden" data-field="OfficeId" name="Input.Offices[@Model.Index].OfficeId" value="@Model.Office.OfficeId" />
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Label</label>
+            <input type="text" data-field="Label" name="Input.Offices[@Model.Index].Label"
+                   value="@Model.Office.Label" placeholder="e.g. Main Office"
+                   class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 focus:ring-primary focus:border-primary" />
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Phone (optional)</label>
+            <input type="tel" data-field="Phone" name="Input.Offices[@Model.Index].Phone"
+                   value="@Model.Office.Phone"
+                   class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 focus:ring-primary focus:border-primary" />
+        </div>
+        <div class="sm:col-span-2">
+            <label class="block text-xs font-medium text-slate-600 mb-1">Street</label>
+            <input type="text" data-field="Street" name="Input.Offices[@Model.Index].Street"
+                   value="@Model.Office.Street"
+                   class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 focus:ring-primary focus:border-primary" />
+        </div>
+        <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">City</label>
+            <input type="text" data-field="City" name="Input.Offices[@Model.Index].City"
+                   value="@Model.Office.City"
+                   class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 focus:ring-primary focus:border-primary" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs font-medium text-slate-600 mb-1">State</label>
+                <select data-field="State" name="Input.Offices[@Model.Index].State"
+                        class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 focus:ring-primary focus:border-primary">
+                    @foreach (var s in PrivatePayDirectory.Core.Models.Taxonomy.UnitedStates)
+                    {
+                        if (Model.Office.State == s)
+                        {
+                            <option value="@s" selected>@s</option>
+                        }
+                        else
+                        {
+                            <option value="@s">@s</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-slate-600 mb-1">Zip</label>
+                <input type="text" data-field="Zip" name="Input.Offices[@Model.Index].Zip"
+                       value="@Model.Office.Zip"
+                       class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 focus:ring-primary focus:border-primary" />
+            </div>
+        </div>
     </div>
 </div>

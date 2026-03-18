@@ -1,13 +1,48 @@
 @page
 @model PrivatePayDirectory.Web.Pages.Therapist.RegisterModel
 @{
-    ViewData["Title"] = "Register as a Therapist";
+    ViewData["Title"] = "Join as a Therapist";
 }
 
-<div class="register-container">
-    <h1>Register as a Therapist</h1>
-    <p>Create your therapist profile. It will be reviewed by an administrator before appearing in the directory.</p>
+<div class="max-w-2xl mx-auto px-4 py-12">
+    <div class="text-center mb-8">
+        <span class="material-symbols-outlined text-5xl text-primary">psychology</span>
+        <h1 class="text-3xl font-bold text-slate-900 mt-3">Join as a Therapist</h1>
+        <p class="text-slate-600 mt-2">Create your profile and connect with clients looking for private pay therapy.</p>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 p-8 mb-6">
+        <h2 class="text-base font-semibold text-slate-800 mb-5">How it works</h2>
+        <ol class="space-y-5">
+            <li class="flex gap-4">
+                <span class="flex-shrink-0 h-7 w-7 rounded-full bg-primary text-white text-sm font-bold flex items-center justify-center mt-0.5">1</span>
+                <div>
+                    <p class="text-sm font-semibold text-slate-800">Create your profile</p>
+                    <p class="text-sm text-slate-500 mt-0.5">Fill in your bio, credentials, specialties, session types, and contact info.</p>
+                </div>
+            </li>
+            <li class="flex gap-4">
+                <span class="flex-shrink-0 h-7 w-7 rounded-full bg-primary text-white text-sm font-bold flex items-center justify-center mt-0.5">2</span>
+                <div>
+                    <p class="text-sm font-semibold text-slate-800">Admin review</p>
+                    <p class="text-sm text-slate-500 mt-0.5">Your profile will be reviewed before it appears in the directory. You can keep editing while it's under review.</p>
+                </div>
+            </li>
+            <li class="flex gap-4">
+                <span class="flex-shrink-0 h-7 w-7 rounded-full bg-primary text-white text-sm font-bold flex items-center justify-center mt-0.5">3</span>
+                <div>
+                    <p class="text-sm font-semibold text-slate-800">Go live</p>
+                    <p class="text-sm text-slate-500 mt-0.5">Once approved, clients can find and contact you through the directory.</p>
+                </div>
+            </li>
+        </ol>
+    </div>
+
     <form method="post">
-        <button type="submit" class="btn btn-primary">Create My Profile</button>
+        <button type="submit"
+                class="w-full py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary/90 transition-colors text-base">
+            Create My Therapist Profile →
+        </button>
     </form>
+    <p class="text-center text-xs text-slate-400 mt-3">You'll be taken to your profile editor immediately after.</p>
 </div>

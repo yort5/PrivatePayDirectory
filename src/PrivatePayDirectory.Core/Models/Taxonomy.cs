@@ -34,18 +34,8 @@ public static class Taxonomy
 
     public static readonly IReadOnlyList<string> InsurancePlans =
     [
-        "Self-Pay Only",
-        "Aetna",
-        "Anthem / Blue Cross Blue Shield",
-        "Cigna",
-        "Humana",
-        "Kaiser Permanente",
-        "Medicaid",
-        "Medicare",
-        "Oscar Health",
-        "United Healthcare",
-        "Optum",
-        "Tricare",
+        "Private Pay",
+        "Sliding Scale",
     ];
 
     public static readonly IReadOnlyList<string> Languages =

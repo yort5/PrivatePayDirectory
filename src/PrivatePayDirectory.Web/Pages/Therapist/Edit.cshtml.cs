@@ -53,6 +53,24 @@ public class EditModel(
         TempData["Success"] = "Profile saved successfully.";
         return RedirectToPage();
     }
+
+    // AJAX handler — returns JSON so the page stays in place
+    public async Task<IActionResult> OnPostSaveAsync()
+    {
+        if (!ModelState.IsValid)
+            return new JsonResult(new { success = false, error = "Please fill in all required fields." });
+
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        var therapist = await therapistRepo.GetByUserIdAsync(userId);
+        if (therapist == null)
+            return new JsonResult(new { success = false, error = "Profile not found." });
+
+        Input.ApplyTo(therapist);
+        therapist.UpdatedAt = DateTime.UtcNow;
+        await therapistRepo.SaveAsync(therapist);
+
+        return new JsonResult(new { success = true });
+    }
 }
 
 public class TherapistInputModel
@@ -81,7 +99,10 @@ public class TherapistInputModel
         ProfilePhotoKey = t.ProfilePhotoKey,
         Phone = t.Phone,
         Email = t.Email,
-        WebsiteUrl = t.WebsiteUrl,
+        // Strip scheme so the input only shows the host/path part
+        WebsiteUrl = t.WebsiteUrl != null
+            ? System.Text.RegularExpressions.Regex.Replace(t.WebsiteUrl, @"^https?://", "", System.Text.RegularExpressions.RegexOptions.IgnoreCase)
+            : null,
         AcceptingNewClients = t.AcceptingNewClients,
         LicensedVirtualStates = [.. t.LicensedVirtualStates],
         Offices = [.. t.Offices],
@@ -98,7 +119,13 @@ public class TherapistInputModel
         t.Bio = Bio;
         t.Phone = Phone;
         t.Email = Email;
-        t.WebsiteUrl = WebsiteUrl;
+
+        // Prepend https:// to the host-only value from the input
+        if (!string.IsNullOrWhiteSpace(WebsiteUrl))
+            t.WebsiteUrl = "https://" + WebsiteUrl.Trim().TrimStart('/');
+        else
+            t.WebsiteUrl = null;
+
         t.AcceptingNewClients = AcceptingNewClients;
         t.LicensedVirtualStates = [.. LicensedVirtualStates];
         t.Offices = [.. Offices];

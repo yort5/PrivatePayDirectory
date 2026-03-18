@@ -1,183 +1,395 @@
 @page
 @model PrivatePayDirectory.Web.Pages.Therapist.EditModel
 @{
-    ViewData["Title"] = "Edit My Profile";
+    ViewData["Title"] = "My Therapist Profile";
     var t = Model.Input;
 }
 
-<div class="edit-container">
-    <h1>My Therapist Profile</h1>
+<div class="max-w-3xl mx-auto px-4 py-8">
+
+    <div class="flex items-center gap-3 mb-6">
+        <h1 class="text-2xl font-bold text-slate-900">My Therapist Profile</h1>
+        @if (!Model.IsVisible)
+        {
+            <span class="px-2.5 py-1 text-xs font-medium bg-amber-100 text-amber-800 rounded-full">Pending Review</span>
+        }
+        else
+        {
+            <span class="px-2.5 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">Visible in Directory</span>
+        }
+    </div>
 
     @if (!Model.IsVisible)
     {
-        <div class="alert alert-info">
-            Your profile is pending admin review and is not yet visible in the directory.
+        <div class="mb-6 flex gap-3 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg px-4 py-3">
+            <span class="material-symbols-outlined text-base flex-shrink-0 mt-0.5">schedule</span>
+            <span>Your profile is pending admin review and not yet visible in the directory. Fill out as much as possible to help the review process.</span>
         </div>
     }
 
-    <form method="post" id="edit-form">
-        <section class="form-section">
-            <h2>Basic Information</h2>
-            <div class="form-row">
-                <label asp-for="Input.FirstName">First Name</label>
-                <input asp-for="Input.FirstName" required />
-                <span asp-validation-for="Input.FirstName"></span>
+    <form method="post" id="edit-form" class="space-y-6">
+
+        {{-- Basic Information --}}
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+            <h2 class="text-base font-semibold text-slate-800 mb-5">Basic Information</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label asp-for="Input.FirstName" class="block text-sm font-medium text-slate-700 mb-1">First Name</label>
+                    <input asp-for="Input.FirstName" required
+                           class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 focus:ring-primary focus:border-primary" />
+                </div>
+                <div>
+                    <label asp-for="Input.LastName" class="block text-sm font-medium text-slate-700 mb-1">Last Name</label>
+                    <input asp-for="Input.LastName" required
+                           class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 focus:ring-primary focus:border-primary" />
+                </div>
             </div>
-            <div class="form-row">
-                <label asp-for="Input.LastName">Last Name</label>
-                <input asp-for="Input.LastName" required />
+            <div class="mt-4">
+                <label asp-for="Input.Title" class="block text-sm font-medium text-slate-700 mb-1">Credentials / Title</label>
+                <input asp-for="Input.Title" placeholder="e.g. LCSW, LPC, PhD"
+                       class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 focus:ring-primary focus:border-primary" />
             </div>
-            <div class="form-row">
-                <label asp-for="Input.Title">Credentials / Title</label>
-                <input asp-for="Input.Title" placeholder="e.g. LCSW, LPC, PhD" />
+            <div class="mt-4">
+                <label asp-for="Input.Bio" class="block text-sm font-medium text-slate-700 mb-1">About Me</label>
+                <textarea asp-for="Input.Bio" rows="5"
+                          class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 focus:ring-primary focus:border-primary"></textarea>
             </div>
-            <div class="form-row">
-                <label asp-for="Input.Bio">About Me</label>
-                <textarea asp-for="Input.Bio" rows="6"></textarea>
-            </div>
-            <div class="form-row">
-                <label asp-for="Input.AcceptingNewClients">
-                    <input asp-for="Input.AcceptingNewClients" type="checkbox" />
-                    Currently Accepting New Clients
+            <div class="mt-4">
+                <label class="flex items-center gap-2 cursor-pointer select-none">
+                    <input asp-for="Input.AcceptingNewClients" type="checkbox"
+                           class="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary" />
+                    <span class="text-sm font-medium text-slate-700">Currently Accepting New Clients</span>
                 </label>
             </div>
-        </section>
+        </div>
 
-        <section class="form-section">
-            <h2>Contact</h2>
-            <div class="form-row">
-                <label asp-for="Input.Phone">Phone</label>
-                <input asp-for="Input.Phone" type="tel" />
+        {{-- Contact --}}
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+            <h2 class="text-base font-semibold text-slate-800 mb-5">Contact Information</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label asp-for="Input.Phone" class="block text-sm font-medium text-slate-700 mb-1">Phone</label>
+                    <input asp-for="Input.Phone" type="tel"
+                           class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 focus:ring-primary focus:border-primary" />
+                </div>
+                <div>
+                    <label asp-for="Input.Email" class="block text-sm font-medium text-slate-700 mb-1">Contact Email</label>
+                    <input asp-for="Input.Email" type="email"
+                           class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 focus:ring-primary focus:border-primary" />
+                </div>
             </div>
-            <div class="form-row">
-                <label asp-for="Input.Email">Contact Email</label>
-                <input asp-for="Input.Email" type="email" />
+            <div class="mt-4">
+                <label asp-for="Input.WebsiteUrl" class="block text-sm font-medium text-slate-700 mb-1">Website</label>
+                <div class="flex items-center rounded-lg border border-slate-300 overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:border-primary">
+                    <span class="px-3 py-2 bg-slate-50 text-slate-500 text-sm border-r border-slate-300 flex-shrink-0 select-none">https://</span>
+                    <input asp-for="Input.WebsiteUrl" type="text" placeholder="yourwebsite.com"
+                           class="flex-1 px-3 py-2 text-sm border-0 focus:ring-0 focus:outline-none" />
+                </div>
             </div>
-            <div class="form-row">
-                <label asp-for="Input.WebsiteUrl">Website</label>
-                <input asp-for="Input.WebsiteUrl" type="url" />
-            </div>
-        </section>
+        </div>
 
-        <section class="form-section">
-            <h2>Profile Photo</h2>
-            @if (Model.CurrentPhotoUrl != null)
-            {
-                <img src="@Model.CurrentPhotoUrl" alt="Current photo" class="current-photo-preview" />
-            }
-            <div id="photo-upload-area">
-                <button type="button" id="btn-get-upload-url" class="btn btn-secondary"
-                        data-therapist-id="@Model.TherapistId">
-                    Upload New Photo
-                </button>
-                <span id="upload-status"></span>
+        {{-- Profile Photo --}}
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+            <h2 class="text-base font-semibold text-slate-800 mb-5">Profile Photo</h2>
+            <div class="flex items-start gap-5">
+                <img id="photo-preview"
+                     src="@(Model.CurrentPhotoUrl ?? "/images/default-profile.svg")"
+                     alt="Profile photo"
+                     class="h-24 w-24 rounded-full object-cover border border-slate-200 flex-shrink-0" />
+                <div>
+                    <button type="button" id="btn-upload-photo"
+                            data-therapist-id="@Model.TherapistId"
+                            class="px-4 py-2 bg-white border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors">
+                        Change Photo
+                    </button>
+                    <p id="upload-status" class="mt-2 text-xs text-slate-500"></p>
+                    <p class="mt-1 text-xs text-slate-400">JPG, PNG or WebP · Max 5 MB · Requires Azurite in dev</p>
+                </div>
             </div>
             <input type="hidden" asp-for="Input.ProfilePhotoKey" id="photo-key-input" />
-        </section>
+        </div>
 
-        <section class="form-section">
-            <h2>Virtual Sessions</h2>
-            <p>Select the states where you are licensed to provide virtual therapy.</p>
-            <div class="state-checkboxes">
+        {{-- Virtual Sessions --}}
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+            <h2 class="text-base font-semibold text-slate-800 mb-1">Virtual Sessions</h2>
+            <p class="text-sm text-slate-500 mb-4">Select the states where you hold an active license to provide virtual therapy.</p>
+            <div class="grid grid-cols-6 sm:grid-cols-9 lg:grid-cols-10 gap-2">
                 @foreach (var state in Model.AllStates)
                 {
-                    <label class="state-check">
+                    <label class="flex items-center gap-1 cursor-pointer">
                         <input type="checkbox" name="Input.LicensedVirtualStates"
                                value="@state"
-                               checked="@(t.LicensedVirtualStates.Contains(state))" />
-                        @state
+                               @(t.LicensedVirtualStates.Contains(state) ? "checked" : "")
+                               class="h-3.5 w-3.5 rounded border-slate-300 text-primary focus:ring-primary" />
+                        <span class="text-xs text-slate-700 font-medium">@state</span>
                     </label>
                 }
             </div>
-        </section>
+        </div>
 
-        <section class="form-section">
-            <h2>In-Person Offices</h2>
-            <div id="offices-container">
+        {{-- In-Person Offices --}}
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+            <div class="flex items-start justify-between mb-5">
+                <div>
+                    <h2 class="text-base font-semibold text-slate-800">In-Person Offices</h2>
+                    <p class="text-sm text-slate-500 mt-0.5">Add locations where you see clients in person.</p>
+                </div>
+                <button type="button" id="btn-add-office"
+                        class="flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors flex-shrink-0">
+                    <span class="material-symbols-outlined text-base">add</span>
+                    Add Office
+                </button>
+            </div>
+            <div id="offices-container" class="space-y-4">
                 @for (int i = 0; i < t.Offices.Count; i++)
                 {
                     <partial name="_OfficeEditor" model="@(i, t.Offices[i])" />
                 }
             </div>
-            <button type="button" id="btn-add-office" class="btn btn-secondary">+ Add Office</button>
-        </section>
+            <p id="no-offices-msg" class="text-sm text-slate-400 italic @(t.Offices.Any() ? "hidden" : "")">
+                No in-person offices added yet.
+            </p>
+        </div>
 
-        <section class="form-section">
-            <h2>Specialties</h2>
-            <div class="taxonomy-checkboxes">
+        {{-- Specialties --}}
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+            <h2 class="text-base font-semibold text-slate-800 mb-4">Specialties</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                 @foreach (var sp in Model.AllSpecialties)
                 {
-                    <label>
+                    <label class="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" name="Input.Specialties"
                                value="@sp"
-                               checked="@(t.Specialties.Contains(sp))" />
-                        @sp
+                               @(t.Specialties.Contains(sp) ? "checked" : "")
+                               class="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary" />
+                        <span class="text-sm text-slate-700">@sp</span>
                     </label>
                 }
             </div>
-        </section>
+        </div>
 
-        <section class="form-section">
-            <h2>Insurance Accepted</h2>
-            <div class="taxonomy-checkboxes">
+        {{-- Insurance --}}
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+            <h2 class="text-base font-semibold text-slate-800 mb-4">Payment Options</h2>
+            <div class="flex flex-col gap-2">
                 @foreach (var ins in Model.AllInsurance)
                 {
-                    <label>
+                    <label class="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" name="Input.InsuranceAccepted"
                                value="@ins"
-                               checked="@(t.InsuranceAccepted.Contains(ins))" />
-                        @ins
+                               @(t.InsuranceAccepted.Contains(ins) ? "checked" : "")
+                               class="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary" />
+                        <span class="text-sm text-slate-700">@ins</span>
                     </label>
                 }
             </div>
-        </section>
+        </div>
 
-        <section class="form-section">
-            <h2>Languages</h2>
-            <div class="taxonomy-checkboxes">
+        {{-- Languages --}}
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+            <h2 class="text-base font-semibold text-slate-800 mb-4">Languages</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                 @foreach (var lang in Model.AllLanguages)
                 {
-                    <label>
+                    <label class="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" name="Input.Languages"
                                value="@lang"
-                               checked="@(t.Languages.Contains(lang))" />
-                        @lang
+                               @(t.Languages.Contains(lang) ? "checked" : "")
+                               class="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary" />
+                        <span class="text-sm text-slate-700">@lang</span>
                     </label>
                 }
             </div>
-        </section>
-
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Save Profile</button>
         </div>
+
+        <div class="flex items-center justify-between pb-8">
+            <span id="save-error" class="hidden flex items-center gap-1.5 text-sm text-red-600">
+                <span class="material-symbols-outlined text-base">error</span>
+                <span id="save-error-msg">Save failed.</span>
+            </span>
+            <button type="submit" id="save-btn"
+                    class="ml-auto px-8 py-2.5 bg-green-50 text-green-700 border border-green-200 font-semibold rounded-lg transition-colors">
+                Saved
+            </button>
+        </div>
+
     </form>
 </div>
 
 @section Scripts {
 <script>
-// S3 pre-signed photo upload
-document.getElementById('btn-get-upload-url')?.addEventListener('click', async () => {
-    const status = document.getElementById('upload-status');
-    const therapistId = document.getElementById('btn-get-upload-url').dataset.therapistId;
+const US_STATES = [@Html.Raw(string.Join(",", Model.AllStates.Select(s => $"\"{s}\"")))];
 
+// ── Dirty / saved tracking ──────────────────────────────────────────────────
+const form = document.getElementById('edit-form');
+const saveError = document.getElementById('save-error');
+const saveErrorMsg = document.getElementById('save-error-msg');
+const saveBtn = document.getElementById('save-btn');
+let isDirty = false;
+
+function applySavedStyle() {
+    saveBtn.textContent = 'Saved';
+    saveBtn.className = 'ml-auto px-8 py-2.5 bg-green-50 text-green-700 border border-green-200 font-semibold rounded-lg transition-colors';
+}
+
+function applyDirtyStyle() {
+    saveBtn.textContent = 'Save Changes';
+    saveBtn.className = 'ml-auto px-8 py-2.5 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 transition-colors ring-2 ring-offset-1 ring-primary';
+}
+
+function markDirty() {
+    if (isDirty) return;
+    isDirty = true;
+    saveError?.classList.add('hidden');
+    applyDirtyStyle();
+}
+
+form.addEventListener('input', markDirty);
+form.addEventListener('change', markDirty);
+
+// ── AJAX form submit ─────────────────────────────────────────────────────────
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saving…';
+    saveError?.classList.add('hidden');
+
+    try {
+        const res = await fetch('?handler=Save', {
+            method: 'POST',
+            body: new FormData(form),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        if (data.success) {
+            isDirty = false;
+            saveBtn.disabled = false;
+            applySavedStyle();
+        } else {
+            throw new Error(data.error || 'Save failed.');
+        }
+    } catch (err) {
+        saveBtn.disabled = false;
+        applyDirtyStyle();
+        if (saveErrorMsg) saveErrorMsg.textContent = err.message;
+        saveError?.classList.remove('hidden');
+    }
+});
+
+// ── Photo upload ─────────────────────────────────────────────────────────────
+document.getElementById('btn-upload-photo')?.addEventListener('click', () => {
+    const therapistId = document.getElementById('btn-upload-photo').dataset.therapistId;
+    const status = document.getElementById('upload-status');
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/jpeg,image/png,image/webp';
     input.onchange = async () => {
         const file = input.files[0];
         if (!file) return;
+        if (file.size > 5 * 1024 * 1024) { status.textContent = 'File too large (max 5 MB).'; return; }
         status.textContent = 'Uploading...';
         try {
-            const res = await fetch(`/api/photo-upload-url?therapistId=${therapistId}&contentType=${encodeURIComponent(file.type)}`);
-            const { uploadUrl, key } = await res.json();
-            await fetch(uploadUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } });
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('therapistId', therapistId);
+            const res = await fetch('/api/photo-upload', { method: 'POST', body: formData });
+            if (!res.ok) throw new Error(res.statusText);
+            const { key } = await res.json();
             document.getElementById('photo-key-input').value = key;
-            status.textContent = '✓ Photo uploaded';
-        } catch {
-            status.textContent = 'Upload failed. Please try again.';
+            document.getElementById('photo-preview').src = URL.createObjectURL(file);
+            status.textContent = '✓ Photo ready — save the profile to confirm.';
+            status.className = 'mt-2 text-xs text-green-600';
+            markDirty();
+        } catch (err) {
+            status.textContent = 'Upload failed. Check that Azurite is running.';
+            status.className = 'mt-2 text-xs text-red-500';
         }
     };
     input.click();
+});
+
+// ── Office editor ─────────────────────────────────────────────────────────────
+const officesContainer = document.getElementById('offices-container');
+const noOfficesMsg = document.getElementById('no-offices-msg');
+
+function reindexOffices() {
+    officesContainer.querySelectorAll('.office-block').forEach((block, i) => {
+        block.querySelectorAll('[data-field]').forEach(el => {
+            el.name = `Input.Offices[${i}].${el.dataset.field}`;
+        });
+        const num = block.querySelector('.office-number');
+        if (num) num.textContent = `Office ${i + 1}`;
+    });
+}
+
+function buildOfficeHtml(idx) {
+    const stateOpts = US_STATES.map(s => `<option value="${s}">${s}</option>`).join('');
+    const id = crypto.randomUUID();
+    return `
+    <div class="office-block bg-slate-50 rounded-lg border border-slate-200 p-4">
+      <div class="flex items-center justify-between mb-3">
+        <span class="office-number text-sm font-semibold text-slate-700">Office ${idx + 1}</span>
+        <button type="button" data-action="remove-office"
+                class="text-sm text-red-500 hover:text-red-700 hover:underline">Remove</button>
+      </div>
+      <input type="hidden" data-field="OfficeId" name="Input.Offices[${idx}].OfficeId" value="${id}" />
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Label</label>
+          <input type="text" data-field="Label" name="Input.Offices[${idx}].Label"
+                 placeholder="e.g. Main Office"
+                 class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 focus:ring-primary focus:border-primary" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Phone (optional)</label>
+          <input type="tel" data-field="Phone" name="Input.Offices[${idx}].Phone"
+                 class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 focus:ring-primary focus:border-primary" />
+        </div>
+        <div class="sm:col-span-2">
+          <label class="block text-xs font-medium text-slate-600 mb-1">Street</label>
+          <input type="text" data-field="Street" name="Input.Offices[${idx}].Street"
+                 class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 focus:ring-primary focus:border-primary" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">City</label>
+          <input type="text" data-field="City" name="Input.Offices[${idx}].City"
+                 class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 focus:ring-primary focus:border-primary" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">State</label>
+            <select data-field="State" name="Input.Offices[${idx}].State"
+                    class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 focus:ring-primary focus:border-primary">
+              ${stateOpts}
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Zip</label>
+            <input type="text" data-field="Zip" name="Input.Offices[${idx}].Zip"
+                   class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 focus:ring-primary focus:border-primary" />
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+document.getElementById('btn-add-office').addEventListener('click', () => {
+    const idx = officesContainer.querySelectorAll('.office-block').length;
+    officesContainer.insertAdjacentHTML('beforeend', buildOfficeHtml(idx));
+    noOfficesMsg?.classList.add('hidden');
+    markDirty();
+});
+
+officesContainer.addEventListener('click', e => {
+    const btn = e.target.closest('[data-action="remove-office"]');
+    if (!btn) return;
+    btn.closest('.office-block').remove();
+    reindexOffices();
+    if (!officesContainer.querySelectorAll('.office-block').length) {
+        noOfficesMsg?.classList.remove('hidden');
+    }
+    markDirty();
 });
 </script>
 }

@@ -14,6 +14,17 @@ public class BlobPhotoService(BlobServiceClient blobServiceClient, IOptions<Blob
     private BlobContainerClient ContainerClient =>
         blobServiceClient.GetBlobContainerClient(_options.ContainerName);
 
+    public async Task<string> UploadPhotoAsync(string therapistId, Stream content, string contentType)
+    {
+        var blobName = GetBlobName(therapistId);
+        var blobClient = ContainerClient.GetBlobClient(blobName);
+        await blobClient.UploadAsync(content, new BlobUploadOptions
+        {
+            HttpHeaders = new BlobHttpHeaders { ContentType = contentType }
+        });
+        return blobName;
+    }
+
     public async Task<string> GenerateUploadUrlAsync(string therapistId, string contentType)
     {
         var blobName = GetBlobName(therapistId);

@@ -14,7 +14,7 @@ RUN dotnet publish src/PrivatePayDirectory.Web/PrivatePayDirectory.Web.csproj \
     -c Release -o /app/publish --no-restore
 
 # Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-bookworm-slim AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
 COPY --from=build /app/publish .

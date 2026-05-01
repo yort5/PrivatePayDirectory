@@ -17,13 +17,11 @@ RUN dotnet publish src/PrivatePayDirectory.Web/PrivatePayDirectory.Web.csproj \
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 
-# Non-root user for security
-RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
-USER appuser
-
 COPY --from=build /app/publish .
 
 ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
+
+USER $APP_UID
 
 ENTRYPOINT ["dotnet", "PrivatePayDirectory.Web.dll"]

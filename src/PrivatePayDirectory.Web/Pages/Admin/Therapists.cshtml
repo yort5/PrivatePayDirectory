@@ -1,68 +1,185 @@
 @page
 @model PrivatePayDirectory.Web.Pages.Admin.TherapistsModel
 @{
-    ViewData["Title"] = "Admin — Therapist Profiles";
+    ViewData["Title"] = "Admin — Therapist Approvals";
 }
 
-<div class="max-w-7xl mx-auto px-6 py-10">
-    <h1 class="text-2xl font-bold text-slate-900 mb-6">Therapist Profiles</h1>
+<div class="max-w-5xl mx-auto px-6 py-10">
+
+    <div class="flex items-center justify-between mb-8">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900">Therapist Approvals</h1>
+            <p class="text-sm text-slate-500 mt-1">Review pending submissions and manage directory visibility.</p>
+        </div>
+        <div class="flex gap-3 text-sm">
+            <span class="px-3 py-1.5 bg-amber-100 text-amber-800 rounded-full font-medium">
+                @Model.Pending.Count pending
+            </span>
+            <span class="px-3 py-1.5 bg-green-100 text-green-800 rounded-full font-medium">
+                @Model.Approved.Count approved
+            </span>
+        </div>
+    </div>
 
     @if (TempData["Success"] != null)
     {
-        <div class="mb-4 px-4 py-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">@TempData["Success"]</div>
+        <div class="mb-6 flex gap-3 bg-green-50 border border-green-200 text-green-800 text-sm rounded-lg px-4 py-3">
+            <span class="material-symbols-outlined text-base flex-shrink-0 mt-0.5">check_circle</span>
+            <span>@TempData["Success"]</span>
+        </div>
     }
 
-    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-        <table class="w-full text-sm">
-            <thead class="bg-slate-50 border-b border-slate-200">
-                <tr>
-                    <th class="px-4 py-3 text-left font-semibold text-slate-600">Name</th>
-                    <th class="px-4 py-3 text-left font-semibold text-slate-600">Email</th>
-                    <th class="px-4 py-3 text-left font-semibold text-slate-600">Visible</th>
-                    <th class="px-4 py-3 text-left font-semibold text-slate-600">Created</th>
-                    <th class="px-4 py-3 text-left font-semibold text-slate-600">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-                @foreach (var t in Model.Therapists)
+    {{-- Pending --}}
+    <section class="mb-10">
+        <h2 class="text-base font-semibold text-slate-700 mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-amber-500 text-base">schedule</span>
+            Pending Review
+        </h2>
+
+        @if (!Model.Pending.Any())
+        {
+            <div class="bg-white rounded-xl border border-slate-200 px-6 py-10 text-center text-slate-400 text-sm">
+                <span class="material-symbols-outlined text-3xl block mb-2">task_alt</span>
+                No profiles awaiting review.
+            </div>
+        }
+        else
+        {
+            <div class="space-y-4">
+                @foreach (var t in Model.Pending)
                 {
-                    <tr class="hover:bg-slate-50 transition-colors @(t.IsVisible ? "" : "bg-amber-50/40")">
-                        <td class="px-4 py-3 text-slate-800">
-                            @if (t.IsVisible)
-                            {
-                                <a asp-page="/Therapist/Profile" asp-route-id="@t.TherapistId" class="text-primary hover:underline font-medium">
-                                    @t.FirstName @t.LastName
-                                </a>
-                            }
-                            else
-                            {
-                                @($"{t.FirstName} {t.LastName}")
-                            }
-                        </td>
-                        <td class="px-4 py-3 text-slate-600">@t.Email</td>
-                        <td class="px-4 py-3">
-                            @if (t.IsVisible)
-                            {
-                                <span class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full font-medium">✓ Visible</span>
-                            }
-                            else
-                            {
-                                <span class="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs rounded-full font-medium">⏳ Pending</span>
-                            }
-                        </td>
-                        <td class="px-4 py-3 text-slate-600">@t.CreatedAt.ToString("MM/dd/yyyy")</td>
-                        <td class="px-4 py-3">
-                            <form method="post">
-                                <input type="hidden" name="therapistId" value="@t.TherapistId" />
-                                <input type="hidden" name="isVisible" value="@(!t.IsVisible)" />
-                                <button type="submit" class="px-3 py-1 text-xs font-semibold rounded-lg border transition-colors @(t.IsVisible ? "border-amber-400 text-amber-700 hover:bg-amber-50" : "border-green-500 text-green-700 hover:bg-green-50")">
-                                    @(t.IsVisible ? "Hide" : "Approve")
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
+                    <div class="bg-white rounded-xl border border-amber-200 shadow-sm overflow-hidden">
+                        <div class="flex gap-5 p-5">
+                            <img src="@(t.ProfilePhotoKey != null ? Model.GetPhotoUrl(t.ProfilePhotoKey) : "/images/default-profile.svg")"
+                                 alt="@t.FirstName @t.LastName"
+                                 class="h-20 w-20 rounded-full object-cover flex-shrink-0 border border-slate-200" />
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-start justify-between gap-4">
+                                    <div>
+                                        <h3 class="font-bold text-slate-900">@t.FirstName @t.LastName
+                                            @if (!string.IsNullOrEmpty(t.Title))
+                                            {
+                                                <span class="text-primary font-normal text-sm">, @t.Title</span>
+                                            }
+                                        </h3>
+                                        <p class="text-xs text-slate-500 mt-0.5">@t.Email · Submitted @t.CreatedAt.ToString("MMM d, yyyy")</p>
+                                    </div>
+                                    <div class="flex items-center gap-2 flex-shrink-0">
+                                        <a asp-page="/Therapist/Profile" asp-route-id="@t.TherapistId"
+                                           class="px-3 py-1.5 text-xs font-medium text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
+                                            Preview
+                                        </a>
+                                        <form method="post">
+                                            <input type="hidden" name="therapistId" value="@t.TherapistId" />
+                                            <input type="hidden" name="isVisible" value="true" />
+                                            <button type="submit"
+                                                    class="px-3 py-1.5 text-xs font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors">
+                                                Approve
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                @if (!string.IsNullOrWhiteSpace(t.Bio))
+                                {
+                                    <p class="text-sm text-slate-600 mt-2 line-clamp-2">@t.Bio</p>
+                                }
+
+                                <div class="flex flex-wrap gap-3 mt-3 text-xs text-slate-500">
+                                    @if (t.OffersVirtual)
+                                    {
+                                        <span class="flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-sm text-primary">videocam</span>
+                                            Virtual (@string.Join(", ", t.LicensedVirtualStates))
+                                        </span>
+                                    }
+                                    @if (t.OffersInPerson)
+                                    {
+                                        <span class="flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-sm text-primary">location_on</span>
+                                            In-Person (@t.Offices.Count office@(t.Offices.Count != 1 ? "s" : ""))
+                                        </span>
+                                    }
+                                    @if (t.Specialties.Any())
+                                    {
+                                        <span class="flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-sm">label</span>
+                                            @string.Join(", ", t.Specialties.Take(3))@(t.Specialties.Count > 3 ? $" +{t.Specialties.Count - 3}" : "")
+                                        </span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 }
-            </tbody>
-        </table>
-    </div>
+            </div>
+        }
+    </section>
+
+    {{-- Approved --}}
+    <section>
+        <h2 class="text-base font-semibold text-slate-700 mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-green-600 text-base">check_circle</span>
+            Approved
+        </h2>
+
+        @if (!Model.Approved.Any())
+        {
+            <div class="bg-white rounded-xl border border-slate-200 px-6 py-8 text-center text-slate-400 text-sm">
+                No approved profiles yet.
+            </div>
+        }
+        else
+        {
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <table class="w-full text-sm">
+                    <thead class="bg-slate-50 border-b border-slate-200">
+                        <tr>
+                            <th class="px-4 py-3 text-left font-semibold text-slate-600">Name</th>
+                            <th class="px-4 py-3 text-left font-semibold text-slate-600">Email</th>
+                            <th class="px-4 py-3 text-left font-semibold text-slate-600">Session Type</th>
+                            <th class="px-4 py-3 text-left font-semibold text-slate-600">Approved</th>
+                            <th class="px-4 py-3"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @foreach (var t in Model.Approved)
+                        {
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-4 py-3">
+                                    <a asp-page="/Therapist/Profile" asp-route-id="@t.TherapistId"
+                                       class="font-medium text-primary hover:underline">
+                                        @t.FirstName @t.LastName
+                                    </a>
+                                    @if (!string.IsNullOrEmpty(t.Title))
+                                    {
+                                        <span class="text-slate-400 text-xs ml-1">@t.Title</span>
+                                    }
+                                </td>
+                                <td class="px-4 py-3 text-slate-600">@t.Email</td>
+                                <td class="px-4 py-3 text-slate-600">
+                                    @if (t.OffersVirtual && t.OffersInPerson) { <span>Virtual + In-Person</span> }
+                                    else if (t.OffersVirtual) { <span>Virtual</span> }
+                                    else if (t.OffersInPerson) { <span>In-Person</span> }
+                                    else { <span class="text-slate-400 italic">Not set</span> }
+                                </td>
+                                <td class="px-4 py-3 text-slate-500">@t.UpdatedAt.ToString("MMM d, yyyy")</td>
+                                <td class="px-4 py-3 text-right">
+                                    <form method="post" class="inline">
+                                        <input type="hidden" name="therapistId" value="@t.TherapistId" />
+                                        <input type="hidden" name="isVisible" value="false" />
+                                        <button type="submit"
+                                                class="px-3 py-1 text-xs font-medium text-amber-700 border border-amber-300 rounded-lg hover:bg-amber-50 transition-colors">
+                                            Hide
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </section>
+
 </div>

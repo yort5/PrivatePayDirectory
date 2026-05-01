@@ -5,7 +5,30 @@
     var t = Model.Therapist;
 }
 
-<div class="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 lg:grid-cols-3 gap-10">
+<div class="max-w-7xl mx-auto px-6 py-10">
+
+@if (!t.IsVisible && User.IsInRole("Administrator"))
+{
+    <div class="mb-6 flex items-center justify-between gap-4 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-lg px-4 py-3">
+        <span class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-base">visibility_off</span>
+            <strong>Admin Preview</strong> — This profile is pending review and not visible to the public.
+        </span>
+        <div class="flex items-center gap-3 flex-shrink-0">
+            <form method="post" asp-page="/Admin/Therapists">
+                <input type="hidden" name="therapistId" value="@t.TherapistId" />
+                <input type="hidden" name="isVisible" value="true" />
+                <button type="submit"
+                        class="px-3 py-1.5 text-xs font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors">
+                    Approve
+                </button>
+            </form>
+            <a asp-page="/Admin/Therapists" class="text-amber-700 font-medium hover:underline">← Back to Approvals</a>
+        </div>
+    </div>
+}
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
     <!-- Main content (left) -->
     <div class="lg:col-span-2 space-y-6">
         <!-- Hero card -->
@@ -176,4 +199,5 @@
             </div>
         </div>
     </div>
+</div>
 </div>

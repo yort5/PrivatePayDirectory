@@ -13,7 +13,11 @@ public class ProfileModel(ITherapistRepository therapistRepo, IPhotoService phot
     public async Task<IActionResult> OnGetAsync(string id)
     {
         var therapist = await therapistRepo.GetByIdAsync(id);
-        if (therapist == null || !therapist.IsVisible)
+        if (therapist == null)
+            return NotFound();
+
+        // Non-admins can only see visible profiles
+        if (!therapist.IsVisible && !User.IsInRole("Administrator"))
             return NotFound();
 
         Therapist = therapist;

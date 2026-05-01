@@ -36,13 +36,20 @@ builder.Services.AddRazorPages(options =>
 });
 
 var app = builder.Build();
+var startupLogger = app.Services.GetRequiredService<ILoggerFactory>().CreateLogger("Startup");
+
+startupLogger.LogInformation(
+    "Application starting. Environment={EnvironmentName}",
+    app.Environment.EnvironmentName);
 
 // Provision Cosmos containers + Blob container; seed dev admin on first run
 using (var scope = app.Services.CreateScope())
 {
+    startupLogger.LogInformation("Ensuring infrastructure resources at startup.");
     await InfrastructureServiceExtensions.EnsureResourcesAsync(scope.ServiceProvider);
     if (app.Environment.IsDevelopment())
     {
+        startupLogger.LogInformation("Development environment detected. Seeding local development data.");
         await SeedDevAdminAsync(scope.ServiceProvider);
         await SeedDevTherapistsAsync(scope.ServiceProvider);
     }
@@ -106,6 +113,8 @@ app.MapGet("/api/photo-upload-url", async (
     var key = $"therapists/{therapistId}/profile";
     return Results.Ok(new { uploadUrl, key });
 }).RequireAuthorization();
+
+startupLogger.LogInformation("Startup complete. Beginning request handling.");
 
 app.Run();
 

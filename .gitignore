@@ -7,3 +7,4 @@ obj/
 
 # User secrets & local config overrides
 appsettings.*.local.json
+src/PrivatePayDirectory.Web/appsettings.Development.json

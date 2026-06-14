@@ -293,16 +293,26 @@ document.getElementById('btn-upload-photo')?.addEventListener('click', () => {
             const formData = new FormData();
             formData.append('file', file);
             formData.append('therapistId', therapistId);
-            const res = await fetch('/api/photo-upload', { method: 'POST', body: formData });
-            if (!res.ok) throw new Error(res.statusText);
-            const { key } = await res.json();
+            
+            const urlRes = await fetch(`/api/photo-upload-url?therapistId=${therapistId}&contentType=${file.type}`);
+
+            if (!urlRes.ok) throw new Error("Failed to get upload URL");
+            const { uploadUrl, key } = await urlRes.json();
+
+            const putRes = await fetch(uploadUrl, {
+                method: 'PUT',
+                headers: { "x-ms-blob-type": "BlockBlob", "Content-Type": file.type },
+                body: file
+            });
+            if (!putRes.ok) throw new Error("Upload failed");
+
             document.getElementById('photo-key-input').value = key;
             document.getElementById('photo-preview').src = URL.createObjectURL(file);
             status.textContent = '✓ Photo ready — save the profile to confirm.';
             status.className = 'mt-2 text-xs text-green-600';
             markDirty();
         } catch (err) {
-            status.textContent = 'Upload failed. Check that Azurite is running.';
+            status.textContent = 'Upload failed.';
             status.className = 'mt-2 text-xs text-red-500';
         }
     };

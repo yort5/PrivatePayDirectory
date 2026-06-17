@@ -120,7 +120,7 @@ app.MapGet("/api/photo-upload-url", async (
         Console.WriteLine(exc.Message);
         return Results.InternalServerError();
     }
-}).RequireAuthorization();
+}).RequireAuthorization().DisableAntiforgery();
 
 startupLogger.LogInformation("Startup complete. Beginning request handling.");
 

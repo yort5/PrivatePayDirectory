@@ -118,6 +118,7 @@ app.MapGet("/api/photo-upload-url", async (
     catch (Exception exc)
     {
         Console.WriteLine(exc.Message);
+        return Results.InternalServerError();
     }
 }).RequireAuthorization();
 

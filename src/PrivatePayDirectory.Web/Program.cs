@@ -105,13 +105,20 @@ app.MapGet("/api/photo-upload-url", async (
     if (!ctx.User.Identity?.IsAuthenticated ?? true)
         return Results.Unauthorized();
 
-    var therapistIdClaim = ctx.User.FindFirst("TherapistId")?.Value;
-    if (therapistIdClaim != therapistId && !ctx.User.IsInRole("Administrator"))
-        return Results.Forbid();
+    try
+    {
+        var therapistIdClaim = ctx.User.FindFirst("TherapistId")?.Value;
+        if (therapistIdClaim != therapistId && !ctx.User.IsInRole("Administrator"))
+            return Results.Forbid();
 
-    var uploadUrl = await photoService.GenerateUploadUrlAsync(therapistId, contentType);
-    var key = $"therapists/{therapistId}/profile";
-    return Results.Ok(new { uploadUrl, key });
+        var uploadUrl = await photoService.GenerateUploadUrlAsync(therapistId, contentType);
+        var key = $"therapists/{therapistId}/profile";
+        return Results.Ok(new { uploadUrl, key });
+    }
+    catch (Exception exc)
+    {
+        Console.WriteLine(exc.Message);
+    }
 }).RequireAuthorization();
 
 startupLogger.LogInformation("Startup complete. Beginning request handling.");

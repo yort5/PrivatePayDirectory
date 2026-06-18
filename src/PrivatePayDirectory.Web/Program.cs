@@ -1,5 +1,7 @@
+using Azure.Storage.Blobs;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using PrivatePayDirectory.Core.Enums;
 using PrivatePayDirectory.Core.Interfaces;
@@ -11,6 +13,18 @@ using System.Security.Claims;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddInfrastructure(builder.Configuration);
+
+// Persist Data Protection keys to blob storage so antiforgery tokens survive restarts/redeployments.
+// Keys are stored in a dedicated container separate from photos.
+var dpBlobConnStr = builder.Configuration["BlobStorage:ConnectionString"];
+if (!string.IsNullOrWhiteSpace(dpBlobConnStr))
+{
+    var keysContainer = new BlobContainerClient(dpBlobConnStr, "dataprotection-keys");
+    keysContainer.CreateIfNotExists();
+    builder.Services.AddDataProtection()
+        .PersistKeysToAzureBlobStorage(keysContainer.GetBlobClient("keys.xml"))
+        .SetApplicationName("PrivatePayDirectory");
+}
 
 // Authentication — cookie with email/password (federation can be added later)
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -65,11 +79,6 @@ app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseWhen(
-    context => !context.Request.Path.StartsWithSegments("/api"),
-    appBuilder => appBuilder.UseAntiforgery()
-);
 
 app.MapStaticAssets();
 app.MapRazorPages().WithStaticAssets();

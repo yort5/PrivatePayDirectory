@@ -43,11 +43,18 @@ public class BlobPhotoService(BlobServiceClient blobServiceClient, IOptions<Blob
         return sasUri.ToString();
     }
 
-    public string GetPhotoUrl(string s3Key)
+    public string GetPhotoUrl(string blobName)
     {
-        // s3Key is reused as blob name for compatibility
-        var blobClient = ContainerClient.GetBlobClient(s3Key);
-        return blobClient.Uri.ToString();
+        var blobClient = ContainerClient.GetBlobClient(blobName);
+        var sasBuilder = new BlobSasBuilder
+        {
+            BlobContainerName = _options.ContainerName,
+            BlobName = blobName,
+            Resource = "b",
+            ExpiresOn = DateTimeOffset.UtcNow.AddHours(1),
+        };
+        sasBuilder.SetPermissions(BlobSasPermissions.Read);
+        return blobClient.GenerateSasUri(sasBuilder).ToString();
     }
 
     public async Task DeletePhotoAsync(string s3Key)

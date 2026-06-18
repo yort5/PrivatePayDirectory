@@ -94,7 +94,7 @@ public static class InfrastructureServiceExtensions
                 blobOptions.ContainerName,
                 !string.IsNullOrWhiteSpace(blobOptions.ConnectionString));
             var containerClient = blobService.GetBlobContainerClient(blobOptions.ContainerName);
-            await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
+            await containerClient.CreateIfNotExistsAsync(PublicAccessType.None);
         }
         catch (Exception ex)
         {

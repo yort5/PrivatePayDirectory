@@ -293,18 +293,13 @@ document.getElementById('btn-upload-photo')?.addEventListener('click', () => {
             const formData = new FormData();
             formData.append('file', file);
             formData.append('therapistId', therapistId);
-            
-            const urlRes = await fetch(`/api/photo-upload-url?therapistId=${therapistId}&contentType=${file.type}`);
 
-            if (!urlRes.ok) throw new Error("Failed to get upload URL");
-            const { uploadUrl, key } = await urlRes.json();
-
-            const putRes = await fetch(uploadUrl, {
-                method: 'PUT',
-                headers: { "x-ms-blob-type": "BlockBlob", "Content-Type": file.type },
-                body: file
+            const uploadRes = await fetch(`/api/photo-upload?therapistId=${therapistId}`, {
+                method: 'POST',
+                body: formData,
             });
-            if (!putRes.ok) throw new Error("Upload failed");
+            if (!uploadRes.ok) throw new Error("Upload failed");
+            const { key } = await uploadRes.json();
 
             document.getElementById('photo-key-input').value = key;
             document.getElementById('photo-preview').src = URL.createObjectURL(file);

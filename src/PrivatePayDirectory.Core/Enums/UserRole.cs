@@ -3,6 +3,6 @@ namespace PrivatePayDirectory.Core.Enums;
 public enum UserRole
 {
     Standard,
-    Therapist,
+    Provider,
     Administrator
 }

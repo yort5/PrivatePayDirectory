@@ -1,14 +1,14 @@
 @page
-@model PrivatePayDirectory.Web.Pages.Therapist.RegisterModel
+@model PrivatePayDirectory.Web.Pages.Provider.RegisterModel
 @{
-    ViewData["Title"] = "Join as a Therapist";
+    ViewData["Title"] = "Join as a Provider";
 }
 
 <div class="max-w-2xl mx-auto px-4 py-12">
     <div class="text-center mb-8">
-        <span class="material-symbols-outlined text-5xl text-primary">psychology</span>
-        <h1 class="text-3xl font-bold text-slate-900 mt-3">Join as a Therapist</h1>
-        <p class="text-slate-600 mt-2">Create your profile and connect with clients looking for private pay therapy.</p>
+        <span class="material-symbols-outlined text-5xl text-primary">person_add</span>
+        <h1 class="text-3xl font-bold text-slate-900 mt-3">Join as a Provider</h1>
+        <p class="text-slate-600 mt-2">Create your profile and connect with clients looking for private pay care.</p>
     </div>
 
     <div class="bg-white rounded-xl border border-slate-200 p-8 mb-6">
@@ -17,7 +17,7 @@
             <li class="flex gap-4">
                 <span class="flex-shrink-0 h-7 w-7 rounded-full bg-primary text-white text-sm font-bold flex items-center justify-center mt-0.5">1</span>
                 <div>
-                    <p class="text-sm font-semibold text-slate-800">Create your profile</p>
+                    <p class="text-sm font-semibold text-slate-800">Choose your profession and create your profile</p>
                     <p class="text-sm text-slate-500 mt-0.5">Fill in your bio, credentials, specialties, session types, and contact info.</p>
                 </div>
             </li>
@@ -38,10 +38,21 @@
         </ol>
     </div>
 
-    <form method="post">
+    <form method="post" class="space-y-4">
+        <div class="bg-white rounded-xl border border-slate-200 p-6">
+            <label class="block text-sm font-semibold text-slate-800 mb-2">I am a…</label>
+            <select asp-for="Profession"
+                    class="w-full rounded-lg border-slate-300 text-sm focus:ring-primary focus:border-primary py-2">
+                @foreach (var (value, display) in Model.ProfessionOptions)
+                {
+                    <option value="@value">@display</option>
+                }
+            </select>
+        </div>
+
         <button type="submit"
                 class="w-full py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary/90 transition-colors text-base">
-            Create My Therapist Profile →
+            Create My Profile →
         </button>
     </form>
     <p class="text-center text-xs text-slate-400 mt-3">You'll be taken to your profile editor immediately after.</p>

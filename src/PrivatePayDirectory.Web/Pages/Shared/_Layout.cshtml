@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -41,19 +41,19 @@
                     <a asp-area="" asp-page="/Directory" class="text-slate-600 hover:text-primary font-medium transition-colors">Directory</a>
                     @if (User.IsInRole("Administrator"))
                     {
-                        <a asp-area="" asp-page="/Admin/Therapists" class="text-slate-600 hover:text-primary font-medium transition-colors">Admin</a>
+                        <a asp-area="" asp-page="/Admin/Providers" class="text-slate-600 hover:text-primary font-medium transition-colors">Admin</a>
                     }
                 </div>
                 <div class="flex items-center gap-3">
                     @if (User.Identity?.IsAuthenticated == true)
                     {
-                        @if (User.FindFirst("TherapistId") != null)
+                        @if (User.FindFirst("ProviderId") != null)
                         {
-                            <a asp-area="" asp-page="/Therapist/Edit" class="text-slate-600 hover:text-primary font-medium transition-colors">My Profile</a>
+                            <a asp-area="" asp-page="/Provider/Edit" class="text-slate-600 hover:text-primary font-medium transition-colors">My Profile</a>
                         }
                         else if (!User.IsInRole("Administrator"))
                         {
-                            <a asp-area="" asp-page="/Therapist/Register" class="text-slate-600 hover:text-primary font-medium transition-colors">Join as Therapist</a>
+                            <a asp-area="" asp-page="/Provider/Register" class="text-slate-600 hover:text-primary font-medium transition-colors">Join as Provider</a>
                         }
                         <form method="post" action="/Account/Logout" style="display:inline">
                             <button type="submit" class="text-slate-600 hover:text-primary font-medium transition-colors bg-transparent border-0 cursor-pointer p-0">Sign Out</button>

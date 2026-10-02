@@ -59,8 +59,8 @@ public class LoginModel(IUserRepository userRepository, IPasswordHasher<AppUser>
             claims.Add(new Claim(ClaimTypes.GivenName, user.FirstName));
         if (!string.IsNullOrEmpty(user.LastName))
             claims.Add(new Claim(ClaimTypes.Surname, user.LastName));
-        if (user.TherapistId != null)
-            claims.Add(new Claim("TherapistId", user.TherapistId));
+        if (user.ProviderId != null)
+            claims.Add(new Claim("ProviderId", user.ProviderId));
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         await HttpContext.SignInAsync(

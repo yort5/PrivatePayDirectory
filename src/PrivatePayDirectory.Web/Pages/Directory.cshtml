@@ -1,7 +1,7 @@
 @page
 @model PrivatePayDirectory.Web.Pages.DirectoryModel
 @{
-    ViewData["Title"] = "Therapist Directory";
+    ViewData["Title"] = "Provider Directory";
 }
 
 <div class="max-w-7xl mx-auto px-6 py-10 flex gap-8 items-start">
@@ -12,6 +12,19 @@
             <a href="/Directory" class="text-sm text-primary hover:underline">Clear</a>
         </div>
         <form method="get" class="space-y-5">
+            <!-- Profession -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Profession</label>
+                <select name="profession" class="w-full rounded-lg border-slate-300 text-sm focus:ring-primary focus:border-primary"
+                        onchange="this.form.submit()">
+                    <option value="">Any</option>
+                    @foreach (var (value, display) in Model.ProfessionOptions)
+                    {
+                        <option value="@value" selected="@(Model.Filter.Profession == value)">@display</option>
+                    }
+                </select>
+            </div>
+
             <!-- Session Mode -->
             <div>
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Session Mode</label>
@@ -71,40 +84,50 @@
     <!-- Main content -->
     <div class="flex-1 min-w-0">
         <div class="mb-6">
-            <h2 class="text-2xl font-bold text-slate-900">Therapist Directory</h2>
-            <p class="text-slate-500 mt-1">@Model.Therapists.Count therapist(s) found</p>
+            <h2 class="text-2xl font-bold text-slate-900">
+                @if (Model.Filter.Profession.HasValue)
+                {
+                    @(PrivatePayDirectory.Core.Models.Taxonomy.ProfessionDisplay[Model.Filter.Profession.Value] + " Directory")
+                }
+                else
+                {
+                    <text>Provider Directory</text>
+                }
+            </h2>
+            <p class="text-slate-500 mt-1">@Model.Providers.Count provider(s) found</p>
         </div>
 
-        @if (Model.Therapists.Any())
+        @if (Model.Providers.Any())
         {
             <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                @foreach (var t in Model.Therapists)
+                @foreach (var p in Model.Providers)
                 {
                     <div class="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex flex-row overflow-hidden">
-                        @if (t.ProfilePhotoKey != null)
+                        @if (p.ProfilePhotoKey != null)
                         {
-                            <img src="@Model.GetPhotoUrl(t.ProfilePhotoKey)" alt="@t.FirstName @t.LastName"
+                            <img src="@Model.GetPhotoUrl(p.ProfilePhotoKey)" alt="@p.FirstName @p.LastName"
                                  class="w-40 h-48 object-cover flex-shrink-0 rounded-l-xl" />
                         }
                         else
                         {
-                            <img src="~/images/default-profile.svg" alt="@t.FirstName @t.LastName"
+                            <img src="~/images/default-profile.svg" alt="@p.FirstName @p.LastName"
                                  class="w-40 h-48 object-cover flex-shrink-0 rounded-l-xl" />
                         }
                         <div class="p-5 flex flex-col flex-1 min-w-0">
-                            <a asp-page="/Therapist/Profile" asp-route-id="@t.TherapistId"
+                            <a asp-page="/Provider/Profile" asp-route-id="@p.ProviderId"
                                class="font-bold text-slate-900 hover:text-primary transition-colors truncate">
-                                @t.FirstName @t.LastName
+                                @p.FirstName @p.LastName
                             </a>
-                            <p class="text-primary text-xs font-medium mt-0.5">@t.Title</p>
-                            @if (!string.IsNullOrWhiteSpace(t.Bio))
+                            <p class="text-primary text-xs font-medium mt-0.5">@p.Title</p>
+                            <p class="text-slate-400 text-xs mt-0.5">@PrivatePayDirectory.Core.Models.Taxonomy.ProfessionDisplay[p.Profession]</p>
+                            @if (!string.IsNullOrWhiteSpace(p.Bio))
                             {
-                                <p class="text-slate-500 text-sm mt-2 line-clamp-2">@t.Bio</p>
+                                <p class="text-slate-500 text-sm mt-2 line-clamp-2">@p.Bio</p>
                             }
-                            @if (t.Specialties.Any())
+                            @if (p.Specialties.Any())
                             {
                                 <div class="flex flex-wrap gap-1 mt-3">
-                                    @foreach (var sp in t.Specialties.Take(3))
+                                    @foreach (var sp in p.Specialties.Take(3))
                                     {
                                         <span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-xs rounded-full">@sp</span>
                                     }
@@ -112,16 +135,16 @@
                             }
                             <div class="flex items-center justify-between mt-auto pt-3">
                                 <div class="flex items-center gap-2 text-slate-400">
-                                    @if (t.OffersVirtual)
+                                    @if (p.OffersVirtual)
                                     {
                                         <span class="material-symbols-outlined text-base" title="Virtual">videocam</span>
                                     }
-                                    @if (t.OffersInPerson)
+                                    @if (p.OffersInPerson)
                                     {
                                         <span class="material-symbols-outlined text-base" title="In-Person">person</span>
                                     }
                                 </div>
-                                <a asp-page="/Therapist/Profile" asp-route-id="@t.TherapistId"
+                                <a asp-page="/Provider/Profile" asp-route-id="@p.ProviderId"
                                    class="px-3 py-1.5 rounded-lg border border-primary text-primary text-xs font-semibold hover:bg-primary/5 transition-colors">
                                     View Profile
                                 </a>
@@ -135,7 +158,7 @@
         {
             <div class="text-center py-20 text-slate-400">
                 <span class="material-symbols-outlined text-5xl mb-3 block">search_off</span>
-                <p class="text-lg font-medium">No therapists match your filters.</p>
+                <p class="text-lg font-medium">No providers match your filters.</p>
                 <p class="text-sm mt-1">Try adjusting your search.</p>
             </div>
         }

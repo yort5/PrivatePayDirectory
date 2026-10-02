@@ -1,14 +1,17 @@
 @page
-@model PrivatePayDirectory.Web.Pages.Therapist.EditModel
+@model PrivatePayDirectory.Web.Pages.Provider.EditModel
 @{
-    ViewData["Title"] = "My Therapist Profile";
+    ViewData["Title"] = "My Profile";
     var t = Model.Input;
 }
 
 <div class="max-w-3xl mx-auto px-4 py-8">
 
     <div class="flex items-center gap-3 mb-6">
-        <h1 class="text-2xl font-bold text-slate-900">My Therapist Profile</h1>
+        <h1 class="text-2xl font-bold text-slate-900">My Profile</h1>
+        <span class="px-2.5 py-1 text-xs font-medium bg-slate-100 text-slate-600 rounded-full">
+            @PrivatePayDirectory.Core.Models.Taxonomy.ProfessionDisplay[Model.Profession]
+        </span>
         @if (!Model.IsVisible)
         {
             <span class="px-2.5 py-1 text-xs font-medium bg-amber-100 text-amber-800 rounded-full">Pending Review</span>
@@ -46,7 +49,7 @@
             </div>
             <div class="mt-4">
                 <label asp-for="Input.Title" class="block text-sm font-medium text-slate-700 mb-1">Credentials / Title</label>
-                <input asp-for="Input.Title" placeholder="e.g. LCSW, LPC, PhD"
+                <input asp-for="Input.Title" placeholder="e.g. LCSW, LPC, PhD, DC"
                        class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 focus:ring-primary focus:border-primary" />
             </div>
             <div class="mt-4">
@@ -98,7 +101,7 @@
                      class="h-24 w-24 rounded-full object-cover border border-slate-200 flex-shrink-0" />
                 <div>
                     <button type="button" id="btn-upload-photo"
-                            data-therapist-id="@Model.TherapistId"
+                            data-provider-id="@Model.ProviderId"
                             class="px-4 py-2 bg-white border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors">
                         Change Photo
                     </button>
@@ -112,7 +115,7 @@
         {{-- Virtual Sessions --}}
         <div class="bg-white rounded-xl border border-slate-200 p-6">
             <h2 class="text-base font-semibold text-slate-800 mb-1">Virtual Sessions</h2>
-            <p class="text-sm text-slate-500 mb-4">Select the states where you hold an active license to provide virtual therapy.</p>
+            <p class="text-sm text-slate-500 mb-4">Select the states where you hold an active license to provide virtual services.</p>
             <div class="grid grid-cols-6 sm:grid-cols-9 lg:grid-cols-10 gap-2">
                 @foreach (var state in Model.AllStates)
                 {
@@ -131,13 +134,13 @@
         <div class="bg-white rounded-xl border border-slate-200 p-6">
             <div class="flex items-start justify-between mb-5">
                 <div>
-                    <h2 class="text-base font-semibold text-slate-800">In-Person Offices</h2>
+                    <h2 class="text-base font-semibold text-slate-800">In-Person Locations</h2>
                     <p class="text-sm text-slate-500 mt-0.5">Add locations where you see clients in person.</p>
                 </div>
                 <button type="button" id="btn-add-office"
                         class="flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors flex-shrink-0">
                     <span class="material-symbols-outlined text-base">add</span>
-                    Add Office
+                    Add Location
                 </button>
             </div>
             <div id="offices-container" class="space-y-4">
@@ -147,7 +150,7 @@
                 }
             </div>
             <p id="no-offices-msg" class="text-sm text-slate-400 italic @(t.Offices.Any() ? "hidden" : "")">
-                No in-person offices added yet.
+                No in-person locations added yet.
             </p>
         </div>
 
@@ -279,7 +282,7 @@ form.addEventListener('submit', async (e) => {
 
 // ── Photo upload ─────────────────────────────────────────────────────────────
 document.getElementById('btn-upload-photo')?.addEventListener('click', () => {
-    const therapistId = document.getElementById('btn-upload-photo').dataset.therapistId;
+    const providerId = document.getElementById('btn-upload-photo').dataset.providerId;
     const status = document.getElementById('upload-status');
     const input = document.createElement('input');
     input.type = 'file';
@@ -292,9 +295,9 @@ document.getElementById('btn-upload-photo')?.addEventListener('click', () => {
         try {
             const formData = new FormData();
             formData.append('file', file);
-            formData.append('therapistId', therapistId);
+            formData.append('providerId', providerId);
 
-            const uploadRes = await fetch(`/api/photo-upload?therapistId=${therapistId}`, {
+            const uploadRes = await fetch(`/api/photo-upload?providerId=${providerId}`, {
                 method: 'POST',
                 body: formData,
             });
@@ -324,7 +327,7 @@ function reindexOffices() {
             el.name = `Input.Offices[${i}].${el.dataset.field}`;
         });
         const num = block.querySelector('.office-number');
-        if (num) num.textContent = `Office ${i + 1}`;
+        if (num) num.textContent = `Location ${i + 1}`;
     });
 }
 
@@ -334,7 +337,7 @@ function buildOfficeHtml(idx) {
     return `
     <div class="office-block bg-slate-50 rounded-lg border border-slate-200 p-4">
       <div class="flex items-center justify-between mb-3">
-        <span class="office-number text-sm font-semibold text-slate-700">Office ${idx + 1}</span>
+        <span class="office-number text-sm font-semibold text-slate-700">Location ${idx + 1}</span>
         <button type="button" data-action="remove-office"
                 class="text-sm text-red-500 hover:text-red-700 hover:underline">Remove</button>
       </div>

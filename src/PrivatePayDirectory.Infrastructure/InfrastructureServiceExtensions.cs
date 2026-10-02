@@ -42,7 +42,7 @@ public static class InfrastructureServiceExtensions
                 Serializer = new CosmosSystemTextJsonSerializer(CosmosJsonOptions)
             }));
 
-        services.AddScoped<ITherapistRepository, CosmosTherapistRepository>();
+        services.AddScoped<IProviderRepository, CosmosProviderRepository>();
         services.AddScoped<IUserRepository, CosmosUserRepository>();
 
         services.Configure<BlobStorageOptions>(configuration.GetSection("BlobStorage"));
@@ -69,9 +69,9 @@ public static class InfrastructureServiceExtensions
         var cosmosOptions = services.GetRequiredService<IOptions<CosmosOptions>>().Value;
 
         logger.LogInformation(
-            "Ensuring Cosmos resources. Database='{DatabaseName}', TherapistsContainer='{TherapistsContainer}', UsersContainer='{UsersContainer}', HasConnectionString={HasConnectionString}, HasAccountEndpoint={HasAccountEndpoint}",
+            "Ensuring Cosmos resources. Database='{DatabaseName}', ProvidersContainer='{ProvidersContainer}', UsersContainer='{UsersContainer}', HasConnectionString={HasConnectionString}, HasAccountEndpoint={HasAccountEndpoint}",
             cosmosOptions.DatabaseName,
-            cosmosOptions.TherapistsContainer,
+            cosmosOptions.ProvidersContainer,
             cosmosOptions.UsersContainer,
             !string.IsNullOrWhiteSpace(cosmosOptions.ConnectionString),
             !string.IsNullOrWhiteSpace(cosmosOptions.AccountEndpoint));
@@ -80,7 +80,7 @@ public static class InfrastructureServiceExtensions
         var db = dbResponse.Database;
 
         await db.CreateContainerIfNotExistsAsync(
-            new ContainerProperties(cosmosOptions.TherapistsContainer, "/id"));
+            new ContainerProperties(cosmosOptions.ProvidersContainer, "/id"));
         await db.CreateContainerIfNotExistsAsync(
             new ContainerProperties(cosmosOptions.UsersContainer, "/id"));
 

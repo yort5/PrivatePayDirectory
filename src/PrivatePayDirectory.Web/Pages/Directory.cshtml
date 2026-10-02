@@ -4,14 +4,31 @@
     ViewData["Title"] = "Provider Directory";
 }
 
-<div class="max-w-7xl mx-auto px-6 py-10 flex gap-8 items-start">
-    <!-- Sidebar Filters -->
-    <aside class="w-72 flex-shrink-0 bg-white rounded-xl border border-slate-200 shadow-sm p-6">
-        <div class="flex items-center justify-between mb-5">
-            <h2 class="font-semibold text-slate-800 text-base">Filter Results</h2>
-            <a href="/Directory" class="text-sm text-primary hover:underline">Clear</a>
+@{
+    var activeFilterCount = Request.Query.Count(q => !string.IsNullOrEmpty(q.Value));
+}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 lg:py-10 flex flex-col lg:flex-row gap-6 lg:gap-8 lg:items-start">
+    <!-- Sidebar Filters (collapsible on narrow screens so results aren't pushed below the form) -->
+    <aside class="w-full lg:w-72 flex-shrink-0 bg-white rounded-xl border border-slate-200 shadow-sm p-5 lg:p-6">
+        <div class="flex items-center justify-between gap-3">
+            <h2 class="font-semibold text-slate-800 text-base">
+                Filter Results
+                @if (activeFilterCount > 0)
+                {
+                    <span class="ml-1 text-xs font-medium text-primary lg:hidden">(@activeFilterCount active)</span>
+                }
+            </h2>
+            <div class="flex items-center gap-4">
+                <a href="/Directory" class="text-sm text-primary hover:underline">Clear</a>
+                <button type="button" id="filter-toggle" aria-controls="filter-form" aria-expanded="false"
+                        class="lg:hidden flex items-center gap-1 text-sm font-medium text-slate-600 bg-transparent border-0 cursor-pointer p-0">
+                    <span id="filter-toggle-label">Show</span>
+                    <span class="material-symbols-outlined text-base" id="filter-toggle-icon">expand_more</span>
+                </button>
+            </div>
         </div>
-        <form method="get" class="space-y-5">
+        <form method="get" id="filter-form" class="space-y-5 mt-5 hidden lg:block">
             <!-- Profession -->
             <div>
                 <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Profession</label>
@@ -106,14 +123,14 @@
                         @if (p.ProfilePhotoKey != null)
                         {
                             <img src="@Model.GetPhotoUrl(p.ProfilePhotoKey)" alt="@p.FirstName @p.LastName"
-                                 class="w-40 h-48 object-cover flex-shrink-0 rounded-l-xl" />
+                                 class="w-28 sm:w-40 min-h-40 sm:h-48 self-stretch object-cover flex-shrink-0 rounded-l-xl" />
                         }
                         else
                         {
                             <img src="~/images/default-profile.svg" alt="@p.FirstName @p.LastName"
-                                 class="w-40 h-48 object-cover flex-shrink-0 rounded-l-xl" />
+                                 class="w-28 sm:w-40 min-h-40 sm:h-48 self-stretch object-cover flex-shrink-0 rounded-l-xl" />
                         }
-                        <div class="p-5 flex flex-col flex-1 min-w-0">
+                        <div class="p-4 sm:p-5 flex flex-col flex-1 min-w-0">
                             <a asp-page="/Provider/Profile" asp-route-id="@p.ProviderId"
                                class="font-bold text-slate-900 hover:text-primary transition-colors truncate">
                                 @p.FirstName @p.LastName
@@ -164,3 +181,19 @@
         }
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Narrow screens: filters start collapsed; this button expands them (always shown at lg and up)
+        (function () {
+            const form = document.getElementById('filter-form');
+            const btn = document.getElementById('filter-toggle');
+            btn.addEventListener('click', function () {
+                const open = form.classList.toggle('hidden') === false;
+                btn.setAttribute('aria-expanded', open);
+                document.getElementById('filter-toggle-label').textContent = open ? 'Hide' : 'Show';
+                document.getElementById('filter-toggle-icon').textContent = open ? 'expand_less' : 'expand_more';
+            });
+        })();
+    </script>
+}

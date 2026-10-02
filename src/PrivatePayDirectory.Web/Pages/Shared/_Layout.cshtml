@@ -31,20 +31,20 @@
 </head>
 <body class="bg-[#f8faf9] text-slate-900 min-h-screen">
     <header class="sticky top-0 z-50 bg-white border-b border-slate-200 shadow-sm">
-        <div class="max-w-7xl mx-auto px-6">
-            <nav class="flex items-center justify-between h-16">
-                <a asp-area="" asp-page="/Index" class="flex items-center gap-2 font-bold text-lg text-primary no-underline">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6">
+            <nav class="flex items-center justify-between h-16 gap-4">
+                <a asp-area="" asp-page="/Index" class="flex items-center gap-2 font-bold text-lg text-primary no-underline whitespace-nowrap">
                     <span class="material-symbols-outlined text-primary">psychology</span>
                     Private Pay Directory
                 </a>
-                <div class="flex items-center gap-6">
+                <div class="hidden md:flex items-center gap-6">
                     <a asp-area="" asp-page="/Directory" class="text-slate-600 hover:text-primary font-medium transition-colors">Directory</a>
                     @if (User.IsInRole("Administrator"))
                     {
                         <a asp-area="" asp-page="/Admin/Providers" class="text-slate-600 hover:text-primary font-medium transition-colors">Admin</a>
                     }
                 </div>
-                <div class="flex items-center gap-3">
+                <div class="hidden md:flex items-center gap-3">
                     @if (User.Identity?.IsAuthenticated == true)
                     {
                         @if (User.FindFirst("ProviderId") != null)
@@ -65,6 +65,39 @@
                         <a asp-page="/Account/Register" class="px-4 py-2 rounded-lg bg-primary text-white font-medium hover:bg-primary/90 transition-colors">Register</a>
                     }
                 </div>
+
+                @* Phone-width menu: same links as above, collapsed behind a menu button (no JS needed) *@
+                <details class="md:hidden relative">
+                    <summary class="list-none [&::-webkit-details-marker]:hidden cursor-pointer p-2 -mr-2 rounded-lg text-slate-600 hover:bg-slate-100 flex" aria-label="Menu">
+                        <span class="material-symbols-outlined">menu</span>
+                    </summary>
+                    <div class="absolute right-0 top-full mt-2 w-56 bg-white border border-slate-200 rounded-xl shadow-lg py-2 flex flex-col text-slate-700 font-medium">
+                        <a asp-area="" asp-page="/Directory" class="px-4 py-2.5 hover:bg-slate-50">Directory</a>
+                        @if (User.IsInRole("Administrator"))
+                        {
+                            <a asp-area="" asp-page="/Admin/Providers" class="px-4 py-2.5 hover:bg-slate-50">Admin</a>
+                        }
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            @if (User.FindFirst("ProviderId") != null)
+                            {
+                                <a asp-area="" asp-page="/Provider/Edit" class="px-4 py-2.5 hover:bg-slate-50">My Profile</a>
+                            }
+                            else if (!User.IsInRole("Administrator"))
+                            {
+                                <a asp-area="" asp-page="/Provider/Register" class="px-4 py-2.5 hover:bg-slate-50">Join as Provider</a>
+                            }
+                            <form method="post" action="/Account/Logout" class="border-t border-slate-100 mt-1 pt-1">
+                                <button type="submit" class="w-full text-left px-4 py-2.5 hover:bg-slate-50 bg-transparent border-0 cursor-pointer">Sign Out</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a asp-page="/Account/Login" class="px-4 py-2.5 hover:bg-slate-50 border-t border-slate-100 mt-1">Sign In</a>
+                            <a asp-page="/Account/Register" class="px-4 py-2.5 hover:bg-slate-50 text-primary">Register</a>
+                        }
+                    </div>
+                </details>
             </nav>
         </div>
     </header>

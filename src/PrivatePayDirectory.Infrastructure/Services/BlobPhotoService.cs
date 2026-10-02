@@ -14,9 +14,9 @@ public class BlobPhotoService(BlobServiceClient blobServiceClient, IOptions<Blob
     private BlobContainerClient ContainerClient =>
         blobServiceClient.GetBlobContainerClient(_options.ContainerName);
 
-    public async Task<string> UploadPhotoAsync(string therapistId, Stream content, string contentType)
+    public async Task<string> UploadPhotoAsync(string providerId, Stream content, string contentType)
     {
-        var blobName = GetBlobName(therapistId);
+        var blobName = GetPhotoKey(providerId);
         var blobClient = ContainerClient.GetBlobClient(blobName);
         await blobClient.UploadAsync(content, new BlobUploadOptions
         {
@@ -25,9 +25,9 @@ public class BlobPhotoService(BlobServiceClient blobServiceClient, IOptions<Blob
         return blobName;
     }
 
-    public async Task<string> GenerateUploadUrlAsync(string therapistId, string contentType)
+    public async Task<string> GenerateUploadUrlAsync(string providerId, string contentType)
     {
-        var blobName = GetBlobName(therapistId);
+        var blobName = GetPhotoKey(providerId);
         var blobClient = ContainerClient.GetBlobClient(blobName);
 
         var sasBuilder = new BlobSasBuilder
@@ -63,12 +63,12 @@ public class BlobPhotoService(BlobServiceClient blobServiceClient, IOptions<Blob
         await blobClient.DeleteIfExistsAsync();
     }
 
-    private static string GetBlobName(string therapistId) =>
-        $"therapists/{therapistId}/profile";
+    public string GetPhotoKey(string providerId) =>
+        $"providers/{providerId}/profile";
 }
 
 public class BlobStorageOptions
 {
     public string ConnectionString { get; set; } = string.Empty;
-    public string ContainerName { get; set; } = "therapist-photos";
+    public string ContainerName { get; set; } = "provider-photos";
 }

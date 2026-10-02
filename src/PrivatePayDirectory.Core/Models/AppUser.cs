@@ -12,8 +12,6 @@ public class AppUser
     public string? LastName { get; set; }
     public UserRole Role { get; set; } = UserRole.Standard;
 
-    // Stored as "therapistId" in Cosmos for backward compat with existing documents
-    [JsonPropertyName("therapistId")]
     public string? ProviderId { get; set; }
 
     /// <summary>

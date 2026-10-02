@@ -136,7 +136,7 @@ app.MapGet("/api/photo-upload-url", async (
             return Results.Forbid();
 
         var uploadUrl = await photoService.GenerateUploadUrlAsync(providerId, contentType);
-        var key = $"providers/{providerId}/profile";
+        var key = photoService.GetPhotoKey(providerId);
         return Results.Ok(new { uploadUrl, key });
     }
     catch (Exception exc)

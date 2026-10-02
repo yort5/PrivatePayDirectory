@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using PrivatePayDirectory.Core.Enums;
 using PrivatePayDirectory.Core.Interfaces;
@@ -11,6 +12,17 @@ public class UsersModel(IUserRepository userRepo) : PageModel
     public IReadOnlyList<AppUser> Users { get; private set; } = [];
     public IReadOnlyList<string> AllRoles { get; } = Enum.GetNames<UserRole>();
     public IReadOnlyList<Profession> AllProfessions { get; } = Enum.GetValues<Profession>();
+
+    // Only unscoped admins may manage users — otherwise a scoped admin could clear their own scope
+    public override async Task OnPageHandlerExecutionAsync(PageHandlerExecutingContext context, PageHandlerExecutionDelegate next)
+    {
+        if (await userRepo.GetAdminScopeAsync(User) != null)
+        {
+            context.Result = Forbid();
+            return;
+        }
+        await next();
+    }
 
     public async Task OnGetAsync()
     {

@@ -14,7 +14,6 @@ public class CosmosProviderRepository(CosmosClient cosmosClient, IOptions<Cosmos
         PropertyNamingPolicy = CosmosPropertyNamingPolicy.CamelCase
     };
 
-    // Physical container name remains "Therapists" for backward compat with existing data
     private Container Container => cosmosClient
         .GetDatabase(options.Value.DatabaseName)
         .GetContainer(options.Value.ProvidersContainer);
@@ -47,6 +46,8 @@ public class CosmosProviderRepository(CosmosClient cosmosClient, IOptions<Cosmos
         var queryable = Container.GetItemLinqQueryable<Provider>(linqSerializerOptions: LinqOptions)
             .Where(p => p.IsVisible);
 
+        if (filter?.Profession is { } profession)
+            queryable = queryable.Where(p => p.Profession == profession);
         if (filter?.AcceptingNewClients == true)
             queryable = queryable.Where(p => p.AcceptingNewClients);
 
@@ -86,10 +87,6 @@ public class CosmosProviderRepository(CosmosClient cosmosClient, IOptions<Cosmos
 
         IEnumerable<Provider> q = providers;
 
-        // Profession filter applied in-memory to correctly handle existing documents that lack the field
-        // (those deserialize to Profession.Therapist, the default enum value)
-        if (filter.Profession.HasValue)
-            q = q.Where(p => p.Profession == filter.Profession.Value);
         if (filter.OffersVirtual == true)
             q = q.Where(p => p.OffersVirtual);
         if (filter.OffersInPerson == true)

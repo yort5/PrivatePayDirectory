@@ -5,7 +5,6 @@ using PrivatePayDirectory.Core.Enums;
 using PrivatePayDirectory.Core.Interfaces;
 using PrivatePayDirectory.Core.Models;
 using PrivatePayDirectory.Web;
-using System.Security.Claims;
 using ProviderModel = PrivatePayDirectory.Core.Models.Provider;
 
 namespace PrivatePayDirectory.Web.Pages.Admin;
@@ -25,7 +24,7 @@ public class ProvidersModel(
 
     public async Task OnGetAsync()
     {
-        var scope = await GetAdminScopeAsync();
+        var scope = await userRepo.GetAdminScopeAsync(User);
 
         var all = (await providerRepo.GetAllAsync())
             .OrderBy(p => p.CreatedAt)
@@ -44,7 +43,7 @@ public class ProvidersModel(
         if (provider == null) return NotFound();
 
         // Defense in depth: verify this admin can manage the target provider's profession
-        var scope = await GetAdminScopeAsync();
+        var scope = await userRepo.GetAdminScopeAsync(User);
         if (scope is { Count: > 0 } && !scope.Contains(provider.Profession))
             return Forbid();
 
@@ -75,14 +74,5 @@ public class ProvidersModel(
             : $"{provider.FirstName} {provider.LastName}'s profile has been hidden.";
 
         return RedirectToPage();
-    }
-
-    /// <summary>Returns the current admin's managed professions, or null if unscoped (can manage all).</summary>
-    private async Task<List<Profession>?> GetAdminScopeAsync()
-    {
-        var adminUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (adminUserId == null) return null;
-        var adminUser = await userRepo.GetByIdAsync(adminUserId);
-        return adminUser?.ManagedProfessions is { Count: > 0 } scope ? scope : null;
     }
 }

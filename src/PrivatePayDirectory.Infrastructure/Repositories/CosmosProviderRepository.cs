@@ -52,7 +52,7 @@ public class CosmosProviderRepository(CosmosClient cosmosClient, IOptions<Cosmos
             queryable = queryable.Where(p => p.AcceptingNewClients);
 
         var providers = await ReadAllAsync(queryable.ToFeedIterator());
-        return ApplyInMemoryFilter(providers, filter);
+        return ProviderFiltering.Apply(providers, filter);
     }
 
     public async Task<IReadOnlyList<Provider>> GetAllAsync()
@@ -79,34 +79,6 @@ public class CosmosProviderRepository(CosmosClient cosmosClient, IOptions<Cosmos
     public async Task DeleteAsync(string providerId)
     {
         await Container.DeleteItemAsync<Provider>(providerId, new PartitionKey(providerId));
-    }
-
-    private static IReadOnlyList<Provider> ApplyInMemoryFilter(List<Provider> providers, ProviderFilter? filter)
-    {
-        if (filter == null) return providers.OrderBy(p => p.LastName).ThenBy(p => p.FirstName).ToList();
-
-        IEnumerable<Provider> q = providers;
-
-        if (filter.OffersVirtual == true)
-            q = q.Where(p => p.OffersVirtual);
-        if (filter.OffersInPerson == true)
-            q = q.Where(p => p.OffersInPerson);
-        if (!string.IsNullOrWhiteSpace(filter.VirtualState))
-            q = q.Where(p => p.LicensedVirtualStates.Contains(filter.VirtualState, StringComparer.OrdinalIgnoreCase));
-        if (!string.IsNullOrWhiteSpace(filter.OfficeState))
-            q = q.Where(p => p.Offices.Any(o => string.Equals(o.State, filter.OfficeState, StringComparison.OrdinalIgnoreCase)));
-        if (!string.IsNullOrWhiteSpace(filter.Specialty))
-            q = q.Where(p => p.Specialties.Contains(filter.Specialty, StringComparer.OrdinalIgnoreCase));
-        if (!string.IsNullOrWhiteSpace(filter.Insurance))
-            q = q.Where(p => p.InsuranceAccepted.Contains(filter.Insurance, StringComparer.OrdinalIgnoreCase));
-        if (!string.IsNullOrWhiteSpace(filter.Language))
-            q = q.Where(p => p.Languages.Contains(filter.Language, StringComparer.OrdinalIgnoreCase));
-        if (filter.AcceptingNewClients.HasValue)
-            q = q.Where(p => p.AcceptingNewClients == filter.AcceptingNewClients.Value);
-        if (!string.IsNullOrWhiteSpace(filter.NameContains))
-            q = q.Where(p => (p.FirstName + " " + p.LastName).Contains(filter.NameContains, StringComparison.OrdinalIgnoreCase));
-
-        return q.OrderBy(p => p.LastName).ThenBy(p => p.FirstName).ToList();
     }
 
     private static async Task<List<Provider>> ReadAllAsync(FeedIterator<Provider> iterator)

@@ -8,6 +8,7 @@ using PrivatePayDirectory.Core.Enums;
 using PrivatePayDirectory.Core.Interfaces;
 using PrivatePayDirectory.Core.Models;
 using PrivatePayDirectory.Infrastructure;
+using PrivatePayDirectory.Infrastructure.Local;
 using PrivatePayDirectory.Web;
 using System.Security.Claims;
 
@@ -145,6 +146,15 @@ app.MapGet("/api/photo-upload-url", async (
         return Results.InternalServerError();
     }
 }).RequireAuthorization().DisableAntiforgery();
+
+// Local storage mode: serve photos saved on disk (Azure mode serves them from Blob Storage via SAS URLs)
+if (app.Services.GetService<LocalPhotoService>() is { } localPhotos)
+{
+    app.MapGet(LocalPhotoService.UrlPrefix + "{**key}", (string key) =>
+        localPhotos.Open(key) is var (content, contentType)
+            ? Results.Stream(content, contentType)
+            : Results.NotFound());
+}
 
 startupLogger.LogInformation("Startup complete. Beginning request handling.");
 

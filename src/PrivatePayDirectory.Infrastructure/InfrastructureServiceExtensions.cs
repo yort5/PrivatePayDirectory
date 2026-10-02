@@ -6,6 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using PrivatePayDirectory.Core.Interfaces;
+using PrivatePayDirectory.Core.Models;
+using PrivatePayDirectory.Infrastructure.Local;
 using PrivatePayDirectory.Infrastructure.Repositories;
 using PrivatePayDirectory.Infrastructure.Serialization;
 using PrivatePayDirectory.Infrastructure.Services;
@@ -26,6 +28,22 @@ public static class InfrastructureServiceExtensions
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
         IConfiguration configuration)
+    {
+        var storageSection = configuration.GetSection("Storage");
+        services.Configure<StorageOptions>(storageSection);
+        var storageOptions = storageSection.Get<StorageOptions>() ?? new();
+
+        if (storageOptions.IsLocal)
+            AddLocalStorage(services, storageOptions);
+        else
+            AddAzureStorage(services, configuration);
+
+        services.AddScoped<INotificationService, NullNotificationService>();
+
+        return services;
+    }
+
+    private static void AddAzureStorage(IServiceCollection services, IConfiguration configuration)
     {
         var cosmosSection = configuration.GetSection("Cosmos");
         if (!cosmosSection.Exists())
@@ -49,20 +67,38 @@ public static class InfrastructureServiceExtensions
         var blobOptions = configuration.GetSection("BlobStorage").Get<BlobStorageOptions>() ?? new();
         services.AddSingleton(_ => new BlobServiceClient(blobOptions.ConnectionString));
         services.AddScoped<IPhotoService, BlobPhotoService>();
+    }
 
-        services.AddScoped<INotificationService, NullNotificationService>();
+    private static void AddLocalStorage(IServiceCollection services, StorageOptions storageOptions)
+    {
+        var root = Path.GetFullPath(storageOptions.LocalDataPath);
+        services.AddSingleton(new LocalJsonStore<Provider>(Path.Combine(root, "providers.json"), p => p.ProviderId));
+        services.AddSingleton(new LocalJsonStore<AppUser>(Path.Combine(root, "users.json"), u => u.UserId));
+        services.AddSingleton<IProviderRepository, LocalProviderRepository>();
+        services.AddSingleton<IUserRepository, LocalUserRepository>();
 
-        return services;
+        var photoService = new LocalPhotoService(Path.Combine(root, "photos"));
+        services.AddSingleton(photoService);
+        services.AddSingleton<IPhotoService>(photoService);
     }
 
     /// <summary>
-    /// Creates the Cosmos database/containers and Blob container if they don't exist.
+    /// Creates the Cosmos database/containers and Blob container if they don't exist (no-op in Local mode).
     /// Call once at startup before handling requests.
     /// </summary>
     public static async Task EnsureResourcesAsync(IServiceProvider services)
     {
         var logger = services.GetRequiredService<ILoggerFactory>()
             .CreateLogger(nameof(InfrastructureServiceExtensions));
+
+        var storageOptions = services.GetRequiredService<IOptions<StorageOptions>>().Value;
+        if (storageOptions.IsLocal)
+        {
+            logger.LogInformation(
+                "Local storage mode — using files under '{Path}' instead of Cosmos DB / Blob Storage.",
+                Path.GetFullPath(storageOptions.LocalDataPath));
+            return;
+        }
 
         // Cosmos containers
         var cosmosClient = services.GetRequiredService<CosmosClient>();

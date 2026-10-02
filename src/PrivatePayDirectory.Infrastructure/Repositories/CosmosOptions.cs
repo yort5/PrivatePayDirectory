@@ -6,6 +6,6 @@ public class CosmosOptions
     public string AccountEndpoint { get; set; } = string.Empty;
     public string AccountKey { get; set; } = string.Empty;
     public string DatabaseName { get; set; } = "PrivatePayDirectory";
-    public string TherapistsContainer { get; set; } = "Therapists";
+    public string ProvidersContainer { get; set; } = "Providers";
     public string UsersContainer { get; set; } = "Users";
 }

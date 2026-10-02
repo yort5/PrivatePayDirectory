@@ -5,6 +5,9 @@ obj/
 # Azurite local blob/queue/table storage data
 .azurite/
 
+# Local storage mode data (Storage:Mode=Local)
+.localdata/
+
 # User secrets & local config overrides
 appsettings.*.local.json
 src/PrivatePayDirectory.Web/appsettings.Development.json

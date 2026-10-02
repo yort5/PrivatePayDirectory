@@ -1,21 +1,29 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using PrivatePayDirectory.Core.Enums;
 using PrivatePayDirectory.Core.Interfaces;
 using PrivatePayDirectory.Core.Models;
-using TherapistModel = PrivatePayDirectory.Core.Models.Therapist;
+using ProviderModel = PrivatePayDirectory.Core.Models.Provider;
 
 namespace PrivatePayDirectory.Web.Pages;
 
-public class DirectoryModel(ITherapistRepository therapistRepo, IPhotoService photoService) : PageModel
+public class DirectoryModel(IProviderRepository providerRepo, IPhotoService photoService) : PageModel
 {
-    public IReadOnlyList<TherapistModel> Therapists { get; private set; } = [];
-    public TherapistFilter Filter { get; private set; } = new();
+    public IReadOnlyList<ProviderModel> Providers { get; private set; } = [];
+    public ProviderFilter Filter { get; private set; } = new();
 
     public IReadOnlyList<string> States => Taxonomy.UnitedStates;
-    public IReadOnlyList<string> Specialties => Taxonomy.Specialties;
+
+    // Specialties scoped to the selected profession, or all specialties when no profession selected
+    public IReadOnlyList<string> Specialties => Filter.Profession.HasValue
+        ? Taxonomy.SpecialtiesByProfession.TryGetValue(Filter.Profession.Value, out var list) ? list : []
+        : Taxonomy.AllSpecialties;
+
     public IReadOnlyList<string> InsurancePlans => Taxonomy.InsurancePlans;
     public IReadOnlyList<string> Languages => Taxonomy.Languages;
+    public IReadOnlyList<(Profession Value, string Display)> ProfessionOptions =>
+        Enum.GetValues<Profession>().Select(p => (p, Taxonomy.ProfessionDisplay[p])).ToList();
 
     public List<SelectListItem> SessionTypeOptions =>
     [
@@ -25,6 +33,7 @@ public class DirectoryModel(ITherapistRepository therapistRepo, IPhotoService ph
     ];
 
     public async Task OnGetAsync(
+        string? profession,
         string? sessionType,
         string? state,
         string? specialty,
@@ -33,8 +42,13 @@ public class DirectoryModel(ITherapistRepository therapistRepo, IPhotoService ph
         bool? acceptingClients,
         string? name)
     {
-        Filter = new TherapistFilter
+        Profession? professionFilter = Enum.TryParse<Profession>(profession, out var parsedProfession)
+            ? parsedProfession
+            : null;
+
+        Filter = new ProviderFilter
         {
+            Profession = professionFilter,
             OffersVirtual = sessionType is "virtual" or "both" ? true : null,
             OffersInPerson = sessionType is "inperson" or "both" ? true : null,
             VirtualState = sessionType is "virtual" or "both" ? state : null,
@@ -46,7 +60,7 @@ public class DirectoryModel(ITherapistRepository therapistRepo, IPhotoService ph
             NameContains = name,
         };
 
-        Therapists = await therapistRepo.GetVisibleAsync(Filter);
+        Providers = await providerRepo.GetVisibleAsync(Filter);
     }
 
     public string GetPhotoUrl(string s3Key) => photoService.GetPhotoUrl(s3Key);

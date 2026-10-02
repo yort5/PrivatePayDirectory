@@ -1,21 +1,21 @@
 @page
-@model PrivatePayDirectory.Web.Pages.Admin.TherapistsModel
+@model PrivatePayDirectory.Web.Pages.Admin.ProvidersModel
 @{
-    ViewData["Title"] = "Admin — Therapist Approvals";
+    ViewData["Title"] = "Admin — Provider Approvals";
 }
 
-<div class="max-w-5xl mx-auto px-6 py-10">
+<div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
 
-    <div class="flex items-center justify-between mb-8">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
-            <h1 class="text-2xl font-bold text-slate-900">Therapist Approvals</h1>
+            <h1 class="text-2xl font-bold text-slate-900">Provider Approvals</h1>
             <p class="text-sm text-slate-500 mt-1">Review pending submissions and manage directory visibility.</p>
         </div>
         <div class="flex gap-3 text-sm">
-            <span class="px-3 py-1.5 bg-amber-100 text-amber-800 rounded-full font-medium">
+            <span class="px-3 py-1.5 bg-amber-100 text-amber-800 rounded-full font-medium whitespace-nowrap">
                 @Model.Pending.Count pending
             </span>
-            <span class="px-3 py-1.5 bg-green-100 text-green-800 rounded-full font-medium">
+            <span class="px-3 py-1.5 bg-green-100 text-green-800 rounded-full font-medium whitespace-nowrap">
                 @Model.Approved.Count approved
             </span>
         </div>
@@ -29,7 +29,7 @@
         </div>
     }
 
-    {{-- Pending --}}
+    @* Pending *@
     <section class="mb-10">
         <h2 class="text-base font-semibold text-slate-700 mb-4 flex items-center gap-2">
             <span class="material-symbols-outlined text-amber-500 text-base">schedule</span>
@@ -46,31 +46,33 @@
         else
         {
             <div class="space-y-4">
-                @foreach (var t in Model.Pending)
+                @foreach (var p in Model.Pending)
                 {
                     <div class="bg-white rounded-xl border border-amber-200 shadow-sm overflow-hidden">
-                        <div class="flex gap-5 p-5">
-                            <img src="@(t.ProfilePhotoKey != null ? Model.GetPhotoUrl(t.ProfilePhotoKey) : "/images/default-profile.svg")"
-                                 alt="@t.FirstName @t.LastName"
-                                 class="h-20 w-20 rounded-full object-cover flex-shrink-0 border border-slate-200" />
+                        <div class="flex gap-4 sm:gap-5 p-4 sm:p-5">
+                            <img src="@(p.ProfilePhotoKey != null ? Model.GetPhotoUrl(p.ProfilePhotoKey) : "/images/default-profile.svg")"
+                                 alt="@p.FirstName @p.LastName"
+                                 class="h-14 w-14 sm:h-20 sm:w-20 rounded-full object-cover flex-shrink-0 border border-slate-200" />
                             <div class="flex-1 min-w-0">
-                                <div class="flex items-start justify-between gap-4">
-                                    <div>
-                                        <h3 class="font-bold text-slate-900">@t.FirstName @t.LastName
-                                            @if (!string.IsNullOrEmpty(t.Title))
+                                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
+                                    <div class="min-w-0">
+                                        <h3 class="font-bold text-slate-900">@p.FirstName @p.LastName
+                                            @if (!string.IsNullOrEmpty(p.Title))
                                             {
-                                                <span class="text-primary font-normal text-sm">, @t.Title</span>
+                                                <span class="text-primary font-normal text-sm">, @p.Title</span>
                                             }
                                         </h3>
-                                        <p class="text-xs text-slate-500 mt-0.5">@t.Email · Submitted @t.CreatedAt.ToString("MMM d, yyyy")</p>
+                                        <p class="text-xs text-slate-500 mt-0.5 break-words">
+                                            @Model.GetProfessionDisplay(p.Profession) · @p.Email · Submitted @p.CreatedAt.ToString("MMM d, yyyy")
+                                        </p>
                                     </div>
                                     <div class="flex items-center gap-2 flex-shrink-0">
-                                        <a asp-page="/Therapist/Profile" asp-route-id="@t.TherapistId"
+                                        <a asp-page="/Provider/Profile" asp-route-id="@p.ProviderId"
                                            class="px-3 py-1.5 text-xs font-medium text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
                                             Preview
                                         </a>
                                         <form method="post">
-                                            <input type="hidden" name="therapistId" value="@t.TherapistId" />
+                                            <input type="hidden" name="providerId" value="@p.ProviderId" />
                                             <input type="hidden" name="isVisible" value="true" />
                                             <button type="submit"
                                                     class="px-3 py-1.5 text-xs font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors">
@@ -80,31 +82,31 @@
                                     </div>
                                 </div>
 
-                                @if (!string.IsNullOrWhiteSpace(t.Bio))
+                                @if (!string.IsNullOrWhiteSpace(p.Bio))
                                 {
-                                    <p class="text-sm text-slate-600 mt-2 line-clamp-2">@t.Bio</p>
+                                    <p class="text-sm text-slate-600 mt-2 line-clamp-2">@p.Bio</p>
                                 }
 
                                 <div class="flex flex-wrap gap-3 mt-3 text-xs text-slate-500">
-                                    @if (t.OffersVirtual)
+                                    @if (p.OffersVirtual)
                                     {
                                         <span class="flex items-center gap-1">
                                             <span class="material-symbols-outlined text-sm text-primary">videocam</span>
-                                            Virtual (@string.Join(", ", t.LicensedVirtualStates))
+                                            Virtual (@string.Join(", ", p.LicensedVirtualStates))
                                         </span>
                                     }
-                                    @if (t.OffersInPerson)
+                                    @if (p.OffersInPerson)
                                     {
                                         <span class="flex items-center gap-1">
                                             <span class="material-symbols-outlined text-sm text-primary">location_on</span>
-                                            In-Person (@t.Offices.Count office@(t.Offices.Count != 1 ? "s" : ""))
+                                            In-Person (@p.Offices.Count location@(p.Offices.Count != 1 ? "s" : ""))
                                         </span>
                                     }
-                                    @if (t.Specialties.Any())
+                                    @if (p.Specialties.Any())
                                     {
                                         <span class="flex items-center gap-1">
                                             <span class="material-symbols-outlined text-sm">label</span>
-                                            @string.Join(", ", t.Specialties.Take(3))@(t.Specialties.Count > 3 ? $" +{t.Specialties.Count - 3}" : "")
+                                            @string.Join(", ", p.Specialties.Take(3))@(p.Specialties.Count > 3 ? $" +{p.Specialties.Count - 3}" : "")
                                         </span>
                                     }
                                 </div>
@@ -116,7 +118,7 @@
         }
     </section>
 
-    {{-- Approved --}}
+    @* Approved *@
     <section>
         <h2 class="text-base font-semibold text-slate-700 mb-4 flex items-center gap-2">
             <span class="material-symbols-outlined text-green-600 text-base">check_circle</span>
@@ -131,11 +133,12 @@
         }
         else
         {
-            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead class="bg-slate-50 border-b border-slate-200">
                         <tr>
                             <th class="px-4 py-3 text-left font-semibold text-slate-600">Name</th>
+                            <th class="px-4 py-3 text-left font-semibold text-slate-600">Profession</th>
                             <th class="px-4 py-3 text-left font-semibold text-slate-600">Email</th>
                             <th class="px-4 py-3 text-left font-semibold text-slate-600">Session Type</th>
                             <th class="px-4 py-3 text-left font-semibold text-slate-600">Approved</th>
@@ -143,30 +146,31 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
-                        @foreach (var t in Model.Approved)
+                        @foreach (var p in Model.Approved)
                         {
                             <tr class="hover:bg-slate-50 transition-colors">
                                 <td class="px-4 py-3">
-                                    <a asp-page="/Therapist/Profile" asp-route-id="@t.TherapistId"
+                                    <a asp-page="/Provider/Profile" asp-route-id="@p.ProviderId"
                                        class="font-medium text-primary hover:underline">
-                                        @t.FirstName @t.LastName
+                                        @p.FirstName @p.LastName
                                     </a>
-                                    @if (!string.IsNullOrEmpty(t.Title))
+                                    @if (!string.IsNullOrEmpty(p.Title))
                                     {
-                                        <span class="text-slate-400 text-xs ml-1">@t.Title</span>
+                                        <span class="text-slate-400 text-xs ml-1">@p.Title</span>
                                     }
                                 </td>
-                                <td class="px-4 py-3 text-slate-600">@t.Email</td>
+                                <td class="px-4 py-3 text-slate-500 text-xs">@Model.GetProfessionDisplay(p.Profession)</td>
+                                <td class="px-4 py-3 text-slate-600">@p.Email</td>
                                 <td class="px-4 py-3 text-slate-600">
-                                    @if (t.OffersVirtual && t.OffersInPerson) { <span>Virtual + In-Person</span> }
-                                    else if (t.OffersVirtual) { <span>Virtual</span> }
-                                    else if (t.OffersInPerson) { <span>In-Person</span> }
+                                    @if (p.OffersVirtual && p.OffersInPerson) { <span>Virtual + In-Person</span> }
+                                    else if (p.OffersVirtual) { <span>Virtual</span> }
+                                    else if (p.OffersInPerson) { <span>In-Person</span> }
                                     else { <span class="text-slate-400 italic">Not set</span> }
                                 </td>
-                                <td class="px-4 py-3 text-slate-500">@t.UpdatedAt.ToString("MMM d, yyyy")</td>
+                                <td class="px-4 py-3 text-slate-500">@p.UpdatedAt.ToString("MMM d, yyyy")</td>
                                 <td class="px-4 py-3 text-right">
                                     <form method="post" class="inline">
-                                        <input type="hidden" name="therapistId" value="@t.TherapistId" />
+                                        <input type="hidden" name="providerId" value="@p.ProviderId" />
                                         <input type="hidden" name="isVisible" value="false" />
                                         <button type="submit"
                                                 class="px-3 py-1 text-xs font-medium text-amber-700 border border-amber-300 rounded-lg hover:bg-amber-50 transition-colors">

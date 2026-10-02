@@ -8,6 +8,7 @@ using PrivatePayDirectory.Core.Enums;
 using PrivatePayDirectory.Core.Interfaces;
 using PrivatePayDirectory.Core.Models;
 using PrivatePayDirectory.Infrastructure;
+using PrivatePayDirectory.Infrastructure.Local;
 using PrivatePayDirectory.Web;
 using System.Security.Claims;
 
@@ -40,14 +41,14 @@ builder.Services.AddScoped<IPasswordHasher<AppUser>, PasswordHasher<AppUser>>();
 // Authorization policies
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy(Policies.RequireAdmin, p => p.RequireRole("Administrator"))
-    .AddPolicy(Policies.RequireTherapist, p => p.RequireRole("Therapist", "Administrator"))
+    .AddPolicy(Policies.RequireProvider, p => p.RequireRole("Provider", "Administrator"))
     .AddPolicy(Policies.RequireAuthenticated, p => p.RequireAuthenticatedUser());
 
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizeFolder("/Admin", Policies.RequireAdmin);
-    options.Conventions.AuthorizePage("/Therapist/Edit", Policies.RequireAuthenticated);
-    options.Conventions.AuthorizePage("/Therapist/Register", Policies.RequireAuthenticated);
+    options.Conventions.AuthorizePage("/Provider/Edit", Policies.RequireAuthenticated);
+    options.Conventions.AuthorizePage("/Provider/Register", Policies.RequireAuthenticated);
 });
 
 var app = builder.Build();
@@ -66,7 +67,7 @@ using (var scope = app.Services.CreateScope())
     {
         startupLogger.LogInformation("Development environment detected. Seeding local development data.");
         await SeedDevAdminAsync(scope.ServiceProvider);
-        await SeedDevTherapistsAsync(scope.ServiceProvider);
+        await SeedDevProvidersAsync(scope.ServiceProvider);
     }
 }
 
@@ -103,48 +104,30 @@ app.MapPost("/Account/Logout", async (HttpContext ctx) =>
 // Minimal API: server-side photo upload (avoids CORS issues with Azurite in dev)
 app.MapPost("/api/photo-upload", async (
     IFormFile file,
-    string therapistId,
+    string providerId,
     IPhotoService photoService,
     HttpContext ctx) =>
 {
     if (!ctx.User.Identity?.IsAuthenticated ?? true)
         return Results.Unauthorized();
 
-    var therapistIdClaim = ctx.User.FindFirst("TherapistId")?.Value;
-    if (therapistIdClaim != therapistId && !ctx.User.IsInRole("Administrator"))
+    var providerIdClaim = ctx.User.FindFirst("ProviderId")?.Value;
+    if (providerIdClaim != providerId && !ctx.User.IsInRole("Administrator"))
         return Results.Forbid();
 
     using var stream = file.OpenReadStream();
-    var key = await photoService.UploadPhotoAsync(therapistId, stream, file.ContentType);
+    var key = await photoService.UploadPhotoAsync(providerId, stream, file.ContentType);
     return Results.Ok(new { key });
 }).RequireAuthorization().DisableAntiforgery();
 
-// Minimal API: generate pre-signed upload URL for therapist photo
-app.MapGet("/api/photo-upload-url", async (
-    string therapistId,
-    string contentType,
-    IPhotoService photoService,
-    HttpContext ctx) =>
+// Local storage mode: serve photos saved on disk (Azure mode serves them from Blob Storage via SAS URLs)
+if (app.Services.GetService<LocalPhotoService>() is { } localPhotos)
 {
-    if (!ctx.User.Identity?.IsAuthenticated ?? true)
-        return Results.Unauthorized();
-
-    try
-    {
-        var therapistIdClaim = ctx.User.FindFirst("TherapistId")?.Value;
-        if (therapistIdClaim != therapistId && !ctx.User.IsInRole("Administrator"))
-            return Results.Forbid();
-
-        var uploadUrl = await photoService.GenerateUploadUrlAsync(therapistId, contentType);
-        var key = $"therapists/{therapistId}/profile";
-        return Results.Ok(new { uploadUrl, key });
-    }
-    catch (Exception exc)
-    {
-        Console.WriteLine(exc.Message);
-        return Results.InternalServerError();
-    }
-}).RequireAuthorization().DisableAntiforgery();
+    app.MapGet(LocalPhotoService.UrlPrefix + "{**key}", (string key) =>
+        localPhotos.Open(key) is var (content, contentType)
+            ? Results.Stream(content, contentType)
+            : Results.NotFound());
+}
 
 startupLogger.LogInformation("Startup complete. Beginning request handling.");
 
@@ -169,24 +152,25 @@ static async Task SeedDevAdminAsync(IServiceProvider services)
     await userRepo.SaveAsync(admin);
 }
 
-static async Task SeedDevTherapistsAsync(IServiceProvider services)
+static async Task SeedDevProvidersAsync(IServiceProvider services)
 {
-    var repo = services.GetRequiredService<ITherapistRepository>();
+    var repo = services.GetRequiredService<IProviderRepository>();
 
     // Skip if already seeded
     var existing = await repo.GetAllAsync();
-    if (existing.Any(t => t.UserId == "seed")) return;
+    if (existing.Any(p => p.UserId == "seed")) return;
 
-    var therapists = new[]
+    var providers = new[]
     {
-        new Therapist
+        new Provider
         {
-            TherapistId = Guid.NewGuid().ToString(),
+            ProviderId = Guid.NewGuid().ToString(),
             UserId = "seed",
             IsVisible = true,
+            Profession = Profession.Therapist,
             FirstName = "Alice", LastName = "Morgan", Title = "LCSW",
             Bio = "Specializing in anxiety and depression with a compassionate, evidence-based approach.",
-            Specialties = ["Anxiety", "Depression", "Trauma & PTSD"],
+            Specialties = ["Anxiety", "Depression", "Trauma / PTSD"],
             InsuranceAccepted = ["Private Pay"],
             Languages = ["English"],
             LicensedVirtualStates = ["TX", "CA", "NY"],
@@ -194,14 +178,15 @@ static async Task SeedDevTherapistsAsync(IServiceProvider services)
             AcceptingNewClients = true,
             Phone = "512-555-0101", Email = "alice.morgan@example.com",
         },
-        new Therapist
+        new Provider
         {
-            TherapistId = Guid.NewGuid().ToString(),
+            ProviderId = Guid.NewGuid().ToString(),
             UserId = "seed",
             IsVisible = true,
+            Profession = Profession.Therapist,
             FirstName = "David", LastName = "Chen", Title = "LPC",
             Bio = "Helping individuals and couples navigate life transitions and relationship challenges.",
-            Specialties = ["Couples Therapy", "Life Transitions", "Stress Management"],
+            Specialties = ["Couples / Marriage", "Life Transitions", "Stress Management"],
             InsuranceAccepted = ["Private Pay"],
             Languages = ["English", "Mandarin"],
             LicensedVirtualStates = [],
@@ -216,14 +201,15 @@ static async Task SeedDevTherapistsAsync(IServiceProvider services)
             AcceptingNewClients = true,
             Phone = "512-555-0202", Email = "david.chen@example.com",
         },
-        new Therapist
+        new Provider
         {
-            TherapistId = Guid.NewGuid().ToString(),
+            ProviderId = Guid.NewGuid().ToString(),
             UserId = "seed",
             IsVisible = true,
+            Profession = Profession.Therapist,
             FirstName = "Maria", LastName = "Gutierrez", Title = "PhD",
             Bio = "Bilingual psychologist offering culturally sensitive care for adults and adolescents.",
-            Specialties = ["Anxiety", "Cultural & Identity Issues", "Adolescents"],
+            Specialties = ["Anxiety", "Child & Adolescent"],
             InsuranceAccepted = ["Private Pay"],
             Languages = ["English", "Spanish"],
             LicensedVirtualStates = ["TX", "FL"],
@@ -238,59 +224,69 @@ static async Task SeedDevTherapistsAsync(IServiceProvider services)
             AcceptingNewClients = true,
             Phone = "713-555-0303", Email = "maria.gutierrez@example.com",
         },
-        new Therapist
+        new Provider
         {
-            TherapistId = Guid.NewGuid().ToString(),
+            ProviderId = Guid.NewGuid().ToString(),
             UserId = "seed",
             IsVisible = true,
-            FirstName = "James", LastName = "Okafor", Title = "LMFT",
-            Bio = "Marriage and family therapist focused on building resilience and healthy communication.",
-            Specialties = ["Couples Therapy", "Family Therapy", "Grief & Loss"],
+            Profession = Profession.Chiropractor,
+            FirstName = "James", LastName = "Okafor", Title = "DC",
+            Bio = "Specializing in sports injuries and chronic pain management with a holistic approach.",
+            Specialties = ["Back Pain", "Sports Injuries", "Neck Pain"],
             InsuranceAccepted = ["Private Pay"],
             Languages = ["English"],
-            LicensedVirtualStates = ["NY", "NJ"],
-            Offices = [],
-            AcceptingNewClients = false,
-            Phone = "212-555-0404", Email = "james.okafor@example.com",
-        },
-        new Therapist
-        {
-            TherapistId = Guid.NewGuid().ToString(),
-            UserId = "seed",
-            IsVisible = true,
-            FirstName = "Sarah", LastName = "Patel", Title = "LCSW",
-            Bio = "Trauma-informed therapist with a focus on EMDR and somatic approaches.",
-            Specialties = ["Trauma & PTSD", "LGBTQ+ Issues", "Anxiety"],
-            InsuranceAccepted = ["Private Pay"],
-            Languages = ["English", "Hindi"],
-            LicensedVirtualStates = ["CA", "WA", "OR"],
+            LicensedVirtualStates = [],
             Offices =
             [
                 new OfficeLocation
                 {
-                    Label = "Seattle Office",
+                    Label = "New York Office",
+                    Street = "100 Broadway", City = "New York", State = "NY", Zip = "10005"
+                }
+            ],
+            AcceptingNewClients = false,
+            Phone = "212-555-0404", Email = "james.okafor@example.com",
+        },
+        new Provider
+        {
+            ProviderId = Guid.NewGuid().ToString(),
+            UserId = "seed",
+            IsVisible = true,
+            Profession = Profession.MassageTherapist,
+            FirstName = "Sarah", LastName = "Patel", Title = "LMT",
+            Bio = "Certified massage therapist offering deep tissue, prenatal, and sports massage.",
+            Specialties = ["Deep Tissue", "Prenatal Massage", "Sports Massage"],
+            InsuranceAccepted = ["Private Pay"],
+            Languages = ["English"],
+            LicensedVirtualStates = [],
+            Offices =
+            [
+                new OfficeLocation
+                {
+                    Label = "Seattle Studio",
                     Street = "789 Pike St", City = "Seattle", State = "WA", Zip = "98101"
                 }
             ],
             AcceptingNewClients = true,
             Phone = "206-555-0505", Email = "sarah.patel@example.com",
         },
-        new Therapist
+        new Provider
         {
-            TherapistId = Guid.NewGuid().ToString(),
+            ProviderId = Guid.NewGuid().ToString(),
             UserId = "seed",
             IsVisible = true,
-            FirstName = "Robert", LastName = "Kim", Title = "PsyD",
-            Bio = "Specializing in men's mental health, performance anxiety, and career stress.",
-            Specialties = ["Men's Issues", "Anxiety", "Stress Management"],
+            Profession = Profession.Hairstylist,
+            FirstName = "Robert", LastName = "Kim", Title = "",
+            Bio = "Specializing in color, balayage, and curly hair — making every client feel their best.",
+            Specialties = ["Color", "Balayage", "Curly Hair"],
             InsuranceAccepted = ["Private Pay"],
             Languages = ["English", "Korean"],
-            LicensedVirtualStates = ["CA"],
+            LicensedVirtualStates = [],
             Offices =
             [
                 new OfficeLocation
                 {
-                    Label = "Los Angeles Office",
+                    Label = "Los Angeles Salon",
                     Street = "321 Wilshire Blvd", City = "Los Angeles", State = "CA", Zip = "90010"
                 }
             ],
@@ -299,8 +295,6 @@ static async Task SeedDevTherapistsAsync(IServiceProvider services)
         },
     };
 
-    foreach (var t in therapists)
-        await repo.SaveAsync(t);
+    foreach (var p in providers)
+        await repo.SaveAsync(p);
 }
-
-

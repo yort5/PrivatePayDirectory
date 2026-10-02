@@ -6,15 +6,15 @@ namespace PrivatePayDirectory.Infrastructure.Services;
 
 public class NullNotificationService(ILogger<NullNotificationService> logger) : INotificationService
 {
-    public Task NotifyProfilePendingReviewAsync(Therapist therapist)
+    public Task NotifyProfilePendingReviewAsync(Provider provider)
     {
-        logger.LogInformation("Notification (not implemented): Profile pending review for {TherapistId}", therapist.TherapistId);
+        logger.LogInformation("Notification (not implemented): Profile pending review for {ProviderId}", provider.ProviderId);
         return Task.CompletedTask;
     }
 
-    public Task NotifyProfileApprovedAsync(Therapist therapist)
+    public Task NotifyProfileApprovedAsync(Provider provider)
     {
-        logger.LogInformation("Notification (not implemented): Profile approved for {TherapistId}", therapist.TherapistId);
+        logger.LogInformation("Notification (not implemented): Profile approved for {ProviderId}", provider.ProviderId);
         return Task.CompletedTask;
     }
 }

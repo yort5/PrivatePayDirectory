@@ -1,14 +1,16 @@
 using System.Text.Json.Serialization;
+using PrivatePayDirectory.Core.Enums;
 
 namespace PrivatePayDirectory.Core.Models;
 
-public class Therapist
+public class Provider
 {
     // Cosmos DB requires a lowercase "id" property
     [JsonPropertyName("id")]
-    public string TherapistId { get; set; } = Guid.NewGuid().ToString();
+    public string ProviderId { get; set; } = Guid.NewGuid().ToString();
     public string UserId { get; set; } = string.Empty;
     public bool IsVisible { get; set; } = false;
+    public Profession Profession { get; set; } = Profession.Therapist;
 
     // Personal info
     public string FirstName { get; set; } = string.Empty;

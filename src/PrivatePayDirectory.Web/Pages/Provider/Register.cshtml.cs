@@ -2,25 +2,31 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using PrivatePayDirectory.Core.Enums;
 using PrivatePayDirectory.Core.Interfaces;
+using PrivatePayDirectory.Core.Models;
 using System.Security.Claims;
-using TherapistModel = PrivatePayDirectory.Core.Models.Therapist;
 
-namespace PrivatePayDirectory.Web.Pages.Therapist;
+namespace PrivatePayDirectory.Web.Pages.Provider;
 
 public class RegisterModel(
-    ITherapistRepository therapistRepo,
+    IProviderRepository providerRepo,
     IUserRepository userRepo,
     INotificationService notifications) : PageModel
 {
+    [BindProperty]
+    public Profession Profession { get; set; } = Profession.Therapist;
+
+    public IEnumerable<(Profession Value, string Display)> ProfessionOptions =>
+        Enum.GetValues<Profession>().Select(p => (p, Taxonomy.ProfessionDisplay[p]));
+
     public async Task<IActionResult> OnGetAsync()
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var user = await userRepo.GetByIdAsync(userId);
 
-        // Already has a therapist profile — send straight to Edit
-        if (user?.TherapistId != null)
-            return RedirectToPage("/Therapist/Edit");
+        if (user?.ProviderId != null)
+            return RedirectToPage("/Provider/Edit");
 
         return Page();
     }
@@ -31,36 +37,37 @@ public class RegisterModel(
         var user = await userRepo.GetByIdAsync(userId);
         if (user == null) return Unauthorized();
 
-        if (user.TherapistId != null)
-            return RedirectToPage("/Therapist/Edit");
+        if (user.ProviderId != null)
+            return RedirectToPage("/Provider/Edit");
 
-        var therapist = new TherapistModel
+        var provider = new Core.Models.Provider
         {
             UserId = userId,
             IsVisible = false,
+            Profession = Profession,
             Email = user.Email,
             FirstName = user.FirstName ?? string.Empty,
             LastName = user.LastName ?? string.Empty,
             InsuranceAccepted = ["Private Pay"],
         };
 
-        await therapistRepo.SaveAsync(therapist);
+        await providerRepo.SaveAsync(provider);
 
-        // Save TherapistId on the user — role stays Standard until Admin approves
-        user.TherapistId = therapist.TherapistId;
+        // Save ProviderId on the user — role stays Standard until Admin approves
+        user.ProviderId = provider.ProviderId;
         await userRepo.SaveAsync(user);
 
-        await notifications.NotifyProfilePendingReviewAsync(therapist);
+        await notifications.NotifyProfilePendingReviewAsync(provider);
 
-        // Re-issue the cookie so the TherapistId claim is available in the nav immediately
-        var claims = User.Claims.Where(c => c.Type != "TherapistId").ToList();
-        claims.Add(new Claim("TherapistId", therapist.TherapistId));
+        // Re-issue the cookie so the ProviderId claim is available in the nav immediately
+        var claims = User.Claims.Where(c => c.Type != "ProviderId").ToList();
+        claims.Add(new Claim("ProviderId", provider.ProviderId));
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         await HttpContext.SignInAsync(
             CookieAuthenticationDefaults.AuthenticationScheme,
             new ClaimsPrincipal(identity),
             new AuthenticationProperties { IsPersistent = true });
 
-        return RedirectToPage("/Therapist/Edit");
+        return RedirectToPage("/Provider/Edit");
     }
 }

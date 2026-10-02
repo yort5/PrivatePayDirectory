@@ -25,24 +25,6 @@ public class BlobPhotoService(BlobServiceClient blobServiceClient, IOptions<Blob
         return blobName;
     }
 
-    public async Task<string> GenerateUploadUrlAsync(string providerId, string contentType)
-    {
-        var blobName = GetPhotoKey(providerId);
-        var blobClient = ContainerClient.GetBlobClient(blobName);
-
-        var sasBuilder = new BlobSasBuilder
-        {
-            BlobContainerName = _options.ContainerName,
-            BlobName = blobName,
-            Resource = "b",
-            ExpiresOn = DateTimeOffset.UtcNow.AddMinutes(15),
-        };
-        sasBuilder.SetPermissions(BlobSasPermissions.Write | BlobSasPermissions.Create);
-
-        var sasUri = blobClient.GenerateSasUri(sasBuilder);
-        return sasUri.ToString();
-    }
-
     public string GetPhotoUrl(string blobName)
     {
         var blobClient = ContainerClient.GetBlobClient(blobName);
@@ -63,7 +45,7 @@ public class BlobPhotoService(BlobServiceClient blobServiceClient, IOptions<Blob
         await blobClient.DeleteIfExistsAsync();
     }
 
-    public string GetPhotoKey(string providerId) =>
+    private static string GetPhotoKey(string providerId) =>
         $"providers/{providerId}/profile";
 }
 

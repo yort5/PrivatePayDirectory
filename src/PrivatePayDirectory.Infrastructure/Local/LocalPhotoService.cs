@@ -9,9 +9,6 @@ public class LocalPhotoService(string rootPath) : IPhotoService
 {
     public const string UrlPrefix = "/local-photos/";
 
-    public string GetPhotoKey(string providerId) =>
-        $"providers/{providerId}/profile";
-
     public async Task<string> UploadPhotoAsync(string providerId, Stream content, string contentType)
     {
         var key = GetPhotoKey(providerId);
@@ -22,9 +19,6 @@ public class LocalPhotoService(string rootPath) : IPhotoService
         await File.WriteAllTextAsync(path + ".contenttype", contentType);
         return key;
     }
-
-    public Task<string> GenerateUploadUrlAsync(string providerId, string contentType) =>
-        throw new NotSupportedException("Direct-to-storage uploads aren't available in Local mode; use /api/photo-upload.");
 
     public string GetPhotoUrl(string key)
     {
@@ -55,6 +49,8 @@ public class LocalPhotoService(string rootPath) : IPhotoService
         return (File.OpenRead(path), contentType);
     }
 
+    private static string GetPhotoKey(string providerId) =>
+        $"providers/{providerId}/profile";
     // Keys come from URLs when serving, so refuse anything that escapes the photo root
     private string? ResolvePath(string key)
     {

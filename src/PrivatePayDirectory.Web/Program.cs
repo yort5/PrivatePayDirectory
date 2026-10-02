@@ -120,33 +120,6 @@ app.MapPost("/api/photo-upload", async (
     return Results.Ok(new { key });
 }).RequireAuthorization().DisableAntiforgery();
 
-// Minimal API: generate pre-signed upload URL for provider photo
-app.MapGet("/api/photo-upload-url", async (
-    string providerId,
-    string contentType,
-    IPhotoService photoService,
-    HttpContext ctx) =>
-{
-    if (!ctx.User.Identity?.IsAuthenticated ?? true)
-        return Results.Unauthorized();
-
-    try
-    {
-        var providerIdClaim = ctx.User.FindFirst("ProviderId")?.Value;
-        if (providerIdClaim != providerId && !ctx.User.IsInRole("Administrator"))
-            return Results.Forbid();
-
-        var uploadUrl = await photoService.GenerateUploadUrlAsync(providerId, contentType);
-        var key = photoService.GetPhotoKey(providerId);
-        return Results.Ok(new { uploadUrl, key });
-    }
-    catch (Exception exc)
-    {
-        Console.WriteLine(exc.Message);
-        return Results.InternalServerError();
-    }
-}).RequireAuthorization().DisableAntiforgery();
-
 // Local storage mode: serve photos saved on disk (Azure mode serves them from Blob Storage via SAS URLs)
 if (app.Services.GetService<LocalPhotoService>() is { } localPhotos)
 {

@@ -1,0 +1,18 @@
+@model IEnumerable<PrivatePayDirectory.Core.Models.ProfessionInfo>
+@* Link cards to other professions' directories — home page "Also find" and directory cross-promotion *@
+
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    @foreach (var p in Model)
+    {
+        <a asp-page="/Directory" asp-route-slug="@p.Slug"
+           class="group flex items-center gap-4 bg-white rounded-xl border border-slate-200 shadow-sm p-5 hover:shadow-md hover:border-primary/40 transition-all no-underline">
+            <span class="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-primary/10 text-primary">
+                <span class="material-symbols-outlined">@p.Icon</span>
+            </span>
+            <span class="min-w-0">
+                <span class="block font-semibold text-slate-900 group-hover:text-primary transition-colors">@p.PluralName</span>
+                <span class="block text-sm text-slate-500">Browse the directory →</span>
+            </span>
+        </a>
+    }
+</div>

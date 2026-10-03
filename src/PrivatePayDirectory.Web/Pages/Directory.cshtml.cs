@@ -1,29 +1,27 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using PrivatePayDirectory.Core.Enums;
 using PrivatePayDirectory.Core.Interfaces;
 using PrivatePayDirectory.Core.Models;
 using ProviderModel = PrivatePayDirectory.Core.Models.Provider;
 
 namespace PrivatePayDirectory.Web.Pages;
 
+/// <summary>One directory page per profession, at /{slug} (e.g. /chiropractors).</summary>
 public class DirectoryModel(IProviderRepository providerRepo, IPhotoService photoService) : PageModel
 {
+    public ProfessionInfo Profession { get; private set; } = null!;
     public IReadOnlyList<ProviderModel> Providers { get; private set; } = [];
     public ProviderFilter Filter { get; private set; } = new();
 
     public IReadOnlyList<string> States => Taxonomy.UnitedStates;
-
-    // Specialties scoped to the selected profession, or all specialties when no profession selected
-    public IReadOnlyList<string> Specialties => Filter.Profession.HasValue
-        ? Taxonomy.SpecialtiesByProfession.TryGetValue(Filter.Profession.Value, out var list) ? list : []
-        : Taxonomy.AllSpecialties;
-
+    public IReadOnlyList<string> Specialties => Taxonomy.SpecialtiesByProfession[Profession.Profession];
     public IReadOnlyList<string> InsurancePlans => Taxonomy.InsurancePlans;
     public IReadOnlyList<string> Languages => Taxonomy.Languages;
-    public IReadOnlyList<(Profession Value, string Display)> ProfessionOptions =>
-        Enum.GetValues<Profession>().Select(p => (p, Taxonomy.ProfessionDisplay[p])).ToList();
+
+    /// <summary>The other professions, for the cross-promotion section.</summary>
+    public IEnumerable<ProfessionInfo> OtherProfessions =>
+        Taxonomy.Professions.Where(p => p.Profession != Profession.Profession);
 
     public List<SelectListItem> SessionTypeOptions =>
     [
@@ -32,8 +30,8 @@ public class DirectoryModel(IProviderRepository providerRepo, IPhotoService phot
         new SelectListItem("Both", "both"),
     ];
 
-    public async Task OnGetAsync(
-        string? profession,
+    public async Task<IActionResult> OnGetAsync(
+        string slug,
         string? sessionType,
         string? state,
         string? specialty,
@@ -42,13 +40,12 @@ public class DirectoryModel(IProviderRepository providerRepo, IPhotoService phot
         bool? acceptingClients,
         string? name)
     {
-        Profession? professionFilter = Enum.TryParse<Profession>(profession, out var parsedProfession)
-            ? parsedProfession
-            : null;
+        // The route constraint already guarantees a known slug
+        Profession = Taxonomy.FindBySlug(slug)!;
 
         Filter = new ProviderFilter
         {
-            Profession = professionFilter,
+            Profession = Profession.Profession,
             OffersVirtual = sessionType is "virtual" or "both" ? true : null,
             OffersInPerson = sessionType is "inperson" or "both" ? true : null,
             VirtualState = sessionType is "virtual" or "both" ? state : null,
@@ -61,6 +58,7 @@ public class DirectoryModel(IProviderRepository providerRepo, IPhotoService phot
         };
 
         Providers = await providerRepo.GetVisibleAsync(Filter);
+        return Page();
     }
 
     public string GetPhotoUrl(string s3Key) => photoService.GetPhotoUrl(s3Key);

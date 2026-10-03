@@ -22,6 +22,12 @@ public class RegisterModel(
 
     public async Task<IActionResult> OnGetAsync()
     {
+        // ?profession={slug} preselects the dropdown (from a directory page's "Join" link). Read from the
+        // query directly: a bound handler parameter would put the raw slug into ModelState under the same
+        // (case-insensitive) key as the Profession field, and the select would then match no option.
+        if (Taxonomy.FindBySlug(Request.Query["profession"]) is { } preselected)
+            Profession = preselected.Profession;
+
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
         var user = await userRepo.GetByIdAsync(userId);
 

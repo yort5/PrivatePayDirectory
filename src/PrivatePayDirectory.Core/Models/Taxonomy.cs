@@ -71,15 +71,6 @@ public static class Taxonomy
             ],
         };
 
-    /// <summary>All specialties across all professions, deduplicated and sorted, for use when no profession filter is active.</summary>
-    public static IReadOnlyList<string> AllSpecialties { get; } =
-        SpecialtiesByProfession.Values
-            .SelectMany(s => s)
-            .Distinct()
-            .OrderBy(s => s)
-            .ToList()
-            .AsReadOnly();
-
     public static readonly IReadOnlyList<string> InsurancePlans =
     [
         "Private Pay",
@@ -112,12 +103,37 @@ public static class Taxonomy
         "DC",
     ];
 
+    /// <summary>
+    /// Every profession, in display order (Therapist leads — it's the site's primary audience).
+    /// Each gets its own directory page at /{Slug}. Adding a profession: add the enum value,
+    /// an entry here, and its specialties above.
+    /// </summary>
+    public static readonly IReadOnlyList<ProfessionInfo> Professions =
+    [
+        new(Profession.Therapist, "therapists", "Therapist", "Therapists",
+            "Find a Private-Pay Therapist",
+            "Browse independent therapists offering virtual and in-person care — no insurance required.",
+            "psychology"),
+        new(Profession.Chiropractor, "chiropractors", "Chiropractor", "Chiropractors",
+            "Find a Private-Pay Chiropractor",
+            "Independent chiropractors offering straightforward, cash-based care — no insurance hoops.",
+            "accessibility_new"),
+        new(Profession.MassageTherapist, "massage-therapists", "Massage Therapist", "Massage Therapists",
+            "Find a Massage Therapist",
+            "Independent massage therapists offering private-pay sessions near you.",
+            "spa"),
+        new(Profession.Hairstylist, "hairstylists", "Hairstylist", "Hairstylists",
+            "Find a Hairstylist",
+            "Independent stylists you book directly — no salon middleman.",
+            "content_cut"),
+    ];
+
+    public static ProfessionInfo Info(Profession profession) =>
+        Professions.First(p => p.Profession == profession);
+
+    public static ProfessionInfo? FindBySlug(string? slug) =>
+        Professions.FirstOrDefault(p => string.Equals(p.Slug, slug, StringComparison.OrdinalIgnoreCase));
+
     public static readonly IReadOnlyDictionary<Profession, string> ProfessionDisplay =
-        new Dictionary<Profession, string>
-        {
-            [Profession.Therapist] = "Therapist",
-            [Profession.Chiropractor] = "Chiropractor",
-            [Profession.MassageTherapist] = "Massage Therapist",
-            [Profession.Hairstylist] = "Hairstylist",
-        };
+        Professions.ToDictionary(p => p.Profession, p => p.DisplayName);
 }

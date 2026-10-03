@@ -44,6 +44,9 @@ builder.Services.AddAuthorizationBuilder()
     .AddPolicy(Policies.RequireProvider, p => p.RequireRole("Provider", "Administrator"))
     .AddPolicy(Policies.RequireAuthenticated, p => p.RequireAuthenticatedUser());
 
+builder.Services.Configure<RouteOptions>(options =>
+    options.ConstraintMap["profession"] = typeof(ProfessionRouteConstraint));
+
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AuthorizeFolder("/Admin", Policies.RequireAdmin);

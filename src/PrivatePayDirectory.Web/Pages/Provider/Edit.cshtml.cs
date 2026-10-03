@@ -20,8 +20,7 @@ public class EditModel(
     public Profession Profession { get; private set; }
 
     public IReadOnlyList<string> AllStates => Taxonomy.UnitedStates;
-    public IReadOnlyList<string> AllSpecialties =>
-        Taxonomy.SpecialtiesByProfession.TryGetValue(Profession, out var list) ? list : Taxonomy.AllSpecialties;
+    public IReadOnlyList<string> AllSpecialties => Taxonomy.SpecialtiesByProfession[Profession];
     public IReadOnlyList<string> AllInsurance => Taxonomy.InsurancePlans;
     public IReadOnlyList<string> AllLanguages => Taxonomy.Languages;
 

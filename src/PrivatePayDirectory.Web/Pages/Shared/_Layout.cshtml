@@ -38,7 +38,7 @@
                     Private Pay Directory
                 </a>
                 <div class="hidden md:flex items-center gap-6">
-                    <a asp-area="" asp-page="/Directory" class="text-slate-600 hover:text-primary font-medium transition-colors">Directory</a>
+                    <a asp-area="" asp-page="/Index" class="text-slate-600 hover:text-primary font-medium transition-colors">Find a Provider</a>
                     @if (User.IsInRole("Administrator"))
                     {
                         <a asp-area="" asp-page="/Admin/Providers" class="text-slate-600 hover:text-primary font-medium transition-colors">Admin</a>
@@ -72,7 +72,7 @@
                         <span class="material-symbols-outlined">menu</span>
                     </summary>
                     <div class="absolute right-0 top-full mt-2 w-56 bg-white border border-slate-200 rounded-xl shadow-lg py-2 flex flex-col text-slate-700 font-medium">
-                        <a asp-area="" asp-page="/Directory" class="px-4 py-2.5 hover:bg-slate-50">Directory</a>
+                        <a asp-area="" asp-page="/Index" class="px-4 py-2.5 hover:bg-slate-50">Find a Provider</a>
                         @if (User.IsInRole("Administrator"))
                         {
                             <a asp-area="" asp-page="/Admin/Providers" class="px-4 py-2.5 hover:bg-slate-50">Admin</a>

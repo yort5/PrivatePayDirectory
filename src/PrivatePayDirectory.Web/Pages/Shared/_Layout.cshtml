@@ -4,6 +4,20 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Private Pay Directory</title>
+    @* Search / AI crawler metadata — pages set these via ViewData (see Seo.cs) *@
+    @if (ViewData["Description"] is string { Length: > 0 } description)
+    {
+        <meta name="description" content="@description" />
+    }
+    @if (ViewData["NoIndex"] is true)
+    {
+        <meta name="robots" content="noindex" />
+    }
+    @if (ViewData["CanonicalPath"] is string canonicalPath)
+    {
+        <link rel="canonical" href="@Seo.AbsoluteUrl(Context, canonicalPath)" />
+    }
+    @await RenderSectionAsync("Head", required: false)
     <script type="importmap"></script>
     <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>

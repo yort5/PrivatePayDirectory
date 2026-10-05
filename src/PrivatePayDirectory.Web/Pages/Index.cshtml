@@ -4,6 +4,8 @@
 @using PrivatePayDirectory.Core.Models
 @{
     ViewData["Title"] = "Find a Private-Pay Therapist";
+    ViewData["Description"] = "Find independent therapists, chiropractors, massage therapists and hairstylists who work outside insurance — compare specialties, locations and virtual options, then contact them directly.";
+    ViewData["CanonicalPath"] = "/";
     // Therapists lead; the other professions are cross-promoted below
     var lead = Taxonomy.Info(Profession.Therapist);
     var others = Taxonomy.Professions.Where(p => p != lead);

@@ -57,6 +57,7 @@ public class RegisterModel(
             InsuranceAccepted = ["Private Pay"],
         };
 
+        await ProviderUrls.AssignSlugAsync(providerRepo, provider);
         await providerRepo.SaveAsync(provider);
 
         // Save ProviderId on the user — role stays Standard until Admin approves

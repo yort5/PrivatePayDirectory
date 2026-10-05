@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\PrivatePayDirectory.Core\PrivatePayDirectory.Core.csproj" />
     <ProjectReference Include="..\..\src\PrivatePayDirectory.Infrastructure\PrivatePayDirectory.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\PrivatePayDirectory.Web\PrivatePayDirectory.Web.csproj" />
   </ItemGroup>
 
 </Project>

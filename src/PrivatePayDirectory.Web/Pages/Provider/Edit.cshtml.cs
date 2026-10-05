@@ -51,6 +51,7 @@ public class EditModel(
         if (provider == null) return NotFound();
 
         Input.ApplyTo(provider);
+        await ProviderUrls.AssignSlugAsync(providerRepo, provider);
         await providerRepo.SaveAsync(provider);
 
         TempData["Success"] = "Profile saved successfully.";
@@ -70,6 +71,7 @@ public class EditModel(
 
         Input.ApplyTo(provider);
         provider.UpdatedAt = DateTime.UtcNow;
+        await ProviderUrls.AssignSlugAsync(providerRepo, provider);
         await providerRepo.SaveAsync(provider);
 
         return new JsonResult(new { success = true });

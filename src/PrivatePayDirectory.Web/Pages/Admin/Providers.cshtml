@@ -67,7 +67,7 @@
                                         </p>
                                     </div>
                                     <div class="flex items-center gap-2 flex-shrink-0">
-                                        <a asp-page="/Provider/Profile" asp-route-id="@p.ProviderId"
+                                        <a href="@ProviderUrls.ProfilePath(p)"
                                            class="px-3 py-1.5 text-xs font-medium text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors">
                                             Preview
                                         </a>
@@ -150,7 +150,7 @@
                         {
                             <tr class="hover:bg-slate-50 transition-colors">
                                 <td class="px-4 py-3">
-                                    <a asp-page="/Provider/Profile" asp-route-id="@p.ProviderId"
+                                    <a href="@ProviderUrls.ProfilePath(p)"
                                        class="font-medium text-primary hover:underline">
                                         @p.FirstName @p.LastName
                                     </a>

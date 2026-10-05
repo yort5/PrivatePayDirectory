@@ -52,6 +52,8 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AuthorizeFolder("/Admin", Policies.RequireAdmin);
     options.Conventions.AuthorizePage("/Provider/Edit", Policies.RequireAuthenticated);
     options.Conventions.AuthorizePage("/Provider/Register", Policies.RequireAuthenticated);
+    // Readable profile URLs, e.g. /therapists/grace-fischer-austin (the id route still works and redirects here)
+    options.Conventions.AddPageRoute("/Provider/Profile", "{profession:profession}/{providerSlug}");
 });
 
 var app = builder.Build();
@@ -125,6 +127,8 @@ app.MapPost("/api/photo-upload", async (
     var key = await photoService.UploadPhotoAsync(providerId, stream, file.ContentType);
     return Results.Ok(new { key });
 }).RequireAuthorization().DisableAntiforgery();
+
+app.MapSeoEndpoints();
 
 // Local storage mode: serve photos saved on disk (Azure mode serves them from Blob Storage via SAS URLs)
 if (app.Services.GetService<LocalPhotoService>() is { } localPhotos)

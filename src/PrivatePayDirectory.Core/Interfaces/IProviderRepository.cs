@@ -21,6 +21,7 @@ public interface IProviderRepository
 {
     Task<Provider?> GetByIdAsync(string providerId);
     Task<Provider?> GetByUserIdAsync(string userId);
+    Task<Provider?> GetBySlugAsync(string slug);
     Task<IReadOnlyList<Provider>> GetVisibleAsync(ProviderFilter? filter = null);
     Task<IReadOnlyList<Provider>> GetAllAsync();  // Admin use
     Task SaveAsync(Provider provider);

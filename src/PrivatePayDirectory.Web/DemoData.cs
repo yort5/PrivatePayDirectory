@@ -70,6 +70,7 @@ public static class DemoData
                     Profession = info.Profession,
                     FirstName = first,
                     LastName = $"{last} (Example)",
+                    Slug = ProviderUrls.Slugify($"{first} {last} example {city.City}"),
                     Title = Pick(rng, Titles[info.Profession]),
                     Bio = Bio(rng, info.Profession, specialties, city.City),
                     Specialties = specialties,

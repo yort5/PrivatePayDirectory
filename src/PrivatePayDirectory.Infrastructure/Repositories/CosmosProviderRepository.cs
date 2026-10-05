@@ -41,6 +41,15 @@ public class CosmosProviderRepository(CosmosClient cosmosClient, IOptions<Cosmos
         return await ReadFirstOrDefaultAsync(query);
     }
 
+    public async Task<Provider?> GetBySlugAsync(string slug)
+    {
+        var query = Container.GetItemLinqQueryable<Provider>(linqSerializerOptions: LinqOptions)
+            .Where(p => p.Slug == slug)
+            .ToFeedIterator();
+
+        return await ReadFirstOrDefaultAsync(query);
+    }
+
     public async Task<IReadOnlyList<Provider>> GetVisibleAsync(ProviderFilter? filter = null)
     {
         var queryable = Container.GetItemLinqQueryable<Provider>(linqSerializerOptions: LinqOptions)

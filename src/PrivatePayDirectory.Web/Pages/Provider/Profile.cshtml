@@ -1,9 +1,25 @@
 @page "{id}"
 @model PrivatePayDirectory.Web.Pages.Provider.ProfileModel
 @{
-    ViewData["Title"] = $"{Model.Provider.FirstName} {Model.Provider.LastName}, {Model.Provider.Title}";
     var t = Model.Provider;
     var profession = PrivatePayDirectory.Core.Models.Taxonomy.Info(t.Profession);
+    var city = t.Offices.FirstOrDefault() is { } firstOffice ? $" in {firstOffice.City}, {firstOffice.State}" : "";
+    var name = string.IsNullOrWhiteSpace(t.Title) ? $"{t.FirstName} {t.LastName}" : $"{t.FirstName} {t.LastName}, {t.Title}";
+    var canonicalPath = ProviderUrls.ProfilePath(t);
+
+    ViewData["Title"] = $"{name} — Private-Pay {profession.DisplayName}{city}";
+    ViewData["Description"] = t.Bio.Length > 155 ? t.Bio[..152].TrimEnd() + "…" : t.Bio;
+    ViewData["CanonicalPath"] = canonicalPath;
+    // Example profiles and not-yet-approved ones must never be indexed or recommended by AI tools
+    ViewData["NoIndex"] = Model.IsDemo || !t.IsVisible;
+}
+
+@section Head {
+    @if (!Model.IsDemo && t.IsVisible)
+    {
+        @* Written raw: Razor would otherwise HTML-encode the '+' in the type attribute *@
+        @Html.Raw(Seo.ProviderJsonLdScript(t, Seo.AbsoluteUrl(HttpContext, canonicalPath)))
+    }
 }
 
 <div class="max-w-7xl mx-auto px-6 py-10">

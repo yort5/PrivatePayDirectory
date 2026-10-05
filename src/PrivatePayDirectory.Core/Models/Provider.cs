@@ -12,6 +12,12 @@ public class Provider
     public bool IsVisible { get; set; } = false;
     public Profession Profession { get; set; } = Profession.Therapist;
 
+    /// <summary>
+    /// Readable, unique URL segment for the public profile (/{profession-slug}/{Slug}),
+    /// e.g. "grace-fischer-austin". Assigned on save; null until the profile is first saved.
+    /// </summary>
+    public string? Slug { get; set; }
+
     // Personal info
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;

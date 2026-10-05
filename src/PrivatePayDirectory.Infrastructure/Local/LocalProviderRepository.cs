@@ -12,6 +12,9 @@ public class LocalProviderRepository(LocalJsonStore<Provider> store) : IProvider
     public Task<Provider?> GetByUserIdAsync(string userId) =>
         Task.FromResult(store.GetAll().FirstOrDefault(p => p.UserId == userId));
 
+    public Task<Provider?> GetBySlugAsync(string slug) =>
+        Task.FromResult(store.GetAll().FirstOrDefault(p => p.Slug == slug));
+
     public Task<IReadOnlyList<Provider>> GetVisibleAsync(ProviderFilter? filter = null) =>
         Task.FromResult(ProviderFiltering.Apply(store.GetAll().Where(p => p.IsVisible), filter));
 

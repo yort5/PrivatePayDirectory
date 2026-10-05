@@ -113,19 +113,19 @@ public static class Taxonomy
         new(Profession.Therapist, "therapists", "Therapist", "Therapists",
             "Find a Private-Pay Therapist",
             "Browse independent therapists offering virtual and in-person care — no insurance required.",
-            "psychology"),
+            "psychology", "MedicalBusiness"),
         new(Profession.Chiropractor, "chiropractors", "Chiropractor", "Chiropractors",
             "Find a Private-Pay Chiropractor",
             "Independent chiropractors offering straightforward, cash-based care — no insurance hoops.",
-            "accessibility_new"),
+            "accessibility_new", "MedicalBusiness"),
         new(Profession.MassageTherapist, "massage-therapists", "Massage Therapist", "Massage Therapists",
             "Find a Massage Therapist",
             "Independent massage therapists offering private-pay sessions near you.",
-            "spa"),
+            "spa", "HealthAndBeautyBusiness"),
         new(Profession.Hairstylist, "hairstylists", "Hairstylist", "Hairstylists",
             "Find a Hairstylist",
             "Independent stylists you book directly — no salon middleman.",
-            "content_cut"),
+            "content_cut", "HairSalon"),
     ];
 
     public static ProfessionInfo Info(Profession profession) =>

@@ -1,4 +1,5 @@
 using PrivatePayDirectory.Core.Interfaces;
+using PrivatePayDirectory.Core.Models;
 
 namespace PrivatePayDirectory.Infrastructure.Local;
 
@@ -22,6 +23,8 @@ public class LocalPhotoService(string rootPath) : IPhotoService
 
     public string GetPhotoUrl(string key)
     {
+        if (StaticPhotos.IsStatic(key)) return key; // static site image (example profiles)
+
         // Version by write time so a replaced photo isn't served from browser cache
         var path = ResolvePath(key);
         var version = path != null && File.Exists(path) ? File.GetLastWriteTimeUtc(path).Ticks : 0;
@@ -30,6 +33,8 @@ public class LocalPhotoService(string rootPath) : IPhotoService
 
     public Task DeletePhotoAsync(string key)
     {
+        if (StaticPhotos.IsStatic(key)) return Task.CompletedTask; // static site image — not ours to delete
+
         var path = ResolvePath(key);
         if (path != null)
         {

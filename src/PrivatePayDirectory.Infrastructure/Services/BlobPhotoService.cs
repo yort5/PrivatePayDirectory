@@ -3,6 +3,7 @@ using Azure.Storage.Blobs.Models;
 using Azure.Storage.Sas;
 using Microsoft.Extensions.Options;
 using PrivatePayDirectory.Core.Interfaces;
+using PrivatePayDirectory.Core.Models;
 
 namespace PrivatePayDirectory.Infrastructure.Services;
 
@@ -27,6 +28,8 @@ public class BlobPhotoService(BlobServiceClient blobServiceClient, IOptions<Blob
 
     public string GetPhotoUrl(string blobName)
     {
+        if (StaticPhotos.IsStatic(blobName)) return blobName; // static site image (example profiles)
+
         var blobClient = ContainerClient.GetBlobClient(blobName);
         var sasBuilder = new BlobSasBuilder
         {
@@ -41,6 +44,8 @@ public class BlobPhotoService(BlobServiceClient blobServiceClient, IOptions<Blob
 
     public async Task DeletePhotoAsync(string s3Key)
     {
+        if (StaticPhotos.IsStatic(s3Key)) return; // static site image — not ours to delete
+
         var blobClient = ContainerClient.GetBlobClient(s3Key);
         await blobClient.DeleteIfExistsAsync();
     }

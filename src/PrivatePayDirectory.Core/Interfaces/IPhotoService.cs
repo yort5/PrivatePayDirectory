@@ -1,5 +1,6 @@
 namespace PrivatePayDirectory.Core.Interfaces;
 
+/// <remarks>Keys for photos shipped with the site (see <see cref="Models.StaticPhotos"/>) are served as-is and never deleted.</remarks>
 public interface IPhotoService
 {
     /// <summary>Uploads a photo stream server-side and returns the blob key.</summary>

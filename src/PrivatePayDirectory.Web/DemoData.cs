@@ -40,6 +40,9 @@ public static class DemoData
             enabled ? "enabled" : "disabled", wanted.Count, existing.Count(p => !wantedIds.Contains(p.ProviderId)));
     }
 
+    /// <summary>Photos of the owners' corgis in wwwroot/images/demo (pet-01.jpg … pet-51.jpg).</summary>
+    private const int PhotoCount = 51;
+
     public static List<Provider> Generate()
     {
         var rng = new Random(20261003);
@@ -65,6 +68,9 @@ public static class DemoData
                 providers.Add(new Provider
                 {
                     ProviderId = id,
+                    // Cycle through the photos across all professions; with 20 or fewer per profession,
+                    // no dog appears twice on the same directory page
+                    ProfilePhotoKey = $"{StaticPhotos.Prefix}pet-{providers.Count % PhotoCount + 1:D2}.jpg",
                     UserId = DemoUserId,
                     IsVisible = true,
                     Profession = info.Profession,

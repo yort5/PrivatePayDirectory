@@ -27,7 +27,7 @@ public class Provider
 
     // Taxonomy (fixed dropdowns)
     public List<string> Specialties { get; set; } = [];
-    public List<string> InsuranceAccepted { get; set; } = [];
+    public List<string> PaymentOptions { get; set; } = [];
     public List<string> Languages { get; set; } = [];
 
     // Contact

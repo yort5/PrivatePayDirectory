@@ -21,7 +21,7 @@ public class EditModel(
 
     public IReadOnlyList<string> AllStates => Taxonomy.UnitedStates;
     public IReadOnlyList<string> AllSpecialties => Taxonomy.SpecialtiesByProfession[Profession];
-    public IReadOnlyList<string> AllInsurance => Taxonomy.InsurancePlans;
+    public IReadOnlyList<string> AllPaymentOptions => Taxonomy.PaymentOptions;
     public IReadOnlyList<string> AllLanguages => Taxonomy.Languages;
 
     public async Task<IActionResult> OnGetAsync()
@@ -90,7 +90,7 @@ public class ProviderInputModel
     public List<string> LicensedVirtualStates { get; set; } = [];
     public List<OfficeLocation> Offices { get; set; } = [];
     public List<string> Specialties { get; set; } = [];
-    public List<string> InsuranceAccepted { get; set; } = [];
+    public List<string> PaymentOptions { get; set; } = [];
     public List<string> Languages { get; set; } = [];
 
     public static ProviderInputModel FromProvider(Core.Models.Provider p) => new()
@@ -110,7 +110,7 @@ public class ProviderInputModel
         LicensedVirtualStates = [.. p.LicensedVirtualStates],
         Offices = [.. p.Offices],
         Specialties = [.. p.Specialties],
-        InsuranceAccepted = [.. p.InsuranceAccepted],
+        PaymentOptions = [.. p.PaymentOptions],
         Languages = [.. p.Languages],
     };
 
@@ -133,7 +133,7 @@ public class ProviderInputModel
         p.LicensedVirtualStates = [.. LicensedVirtualStates];
         p.Offices = [.. Offices];
         p.Specialties = [.. Specialties];
-        p.InsuranceAccepted = [.. InsuranceAccepted];
+        p.PaymentOptions = [.. PaymentOptions];
         p.Languages = [.. Languages];
         if (!string.IsNullOrEmpty(ProfilePhotoKey))
             p.ProfilePhotoKey = ProfilePhotoKey;

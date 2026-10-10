@@ -116,15 +116,15 @@
             </div>
         }
 
-        <!-- Insurance -->
-        @if (t.InsuranceAccepted.Any())
+        <!-- Fees & payment -->
+        @if (t.PaymentOptions.Any())
         {
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-8">
-                <h2 class="text-lg font-semibold text-slate-900 mb-4">Insurance &amp; Fees</h2>
+                <h2 class="text-lg font-semibold text-slate-900 mb-4">Fees &amp; Payment</h2>
                 <div class="flex flex-wrap gap-2">
-                    @foreach (var ins in t.InsuranceAccepted)
+                    @foreach (var option in t.PaymentOptions)
                     {
-                        <span class="px-3 py-1.5 bg-slate-100 text-slate-700 text-sm rounded-full">@ins</span>
+                        <span class="px-3 py-1.5 bg-slate-100 text-slate-700 text-sm rounded-full">@option</span>
                     }
                 </div>
             </div>
@@ -134,7 +134,9 @@
         @if (t.OffersVirtual && t.LicensedVirtualStates.Any())
         {
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-8">
-                <h2 class="text-lg font-semibold text-slate-900 mb-4">Virtual Sessions — Licensed States</h2>
+                <h2 class="text-lg font-semibold text-slate-900 mb-4">
+                    Virtual Sessions@(t.Profession == PrivatePayDirectory.Core.Enums.Profession.Therapist ? " — Licensed States" : " — States Served")
+                </h2>
                 <div class="flex flex-wrap gap-2">
                     @foreach (var s in t.LicensedVirtualStates)
                     {

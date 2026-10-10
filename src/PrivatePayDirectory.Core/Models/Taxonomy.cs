@@ -69,12 +69,30 @@ public static class Taxonomy
                 "Balayage",
                 "Keratin Treatments",
             ],
+            [Profession.LifeCoach] =
+            [
+                "Career Transitions",
+                "Confidence & Mindset",
+                "Life Purpose & Direction",
+                "Relationships",
+                "Productivity & Habits",
+                "Leadership",
+                "Health & Wellness Goals",
+                "Work-Life Balance",
+                "Parenting",
+                "Life After Retirement",
+            ],
         };
 
-    public static readonly IReadOnlyList<string> InsurancePlans =
+    /// <summary>
+    /// How a provider makes private pay easier. Every provider here is private pay, so that isn't an option;
+    /// the site deliberately doesn't mention insurance outside the About page FAQ.
+    /// </summary>
+    public static readonly IReadOnlyList<string> PaymentOptions =
     [
-        "Private Pay",
         "Sliding Scale",
+        "Free Initial Consultation",
+        "HSA/FSA Accepted",
     ];
 
     public static readonly IReadOnlyList<string> Languages =
@@ -112,11 +130,15 @@ public static class Taxonomy
     [
         new(Profession.Therapist, "therapists", "Therapist", "Therapists",
             "Find a Private-Pay Therapist",
-            "Browse independent therapists offering virtual and in-person care — no insurance required.",
+            "Independent therapists offering virtual and in-person care. You pay them directly, so your care stays between the two of you.",
             "psychology"),
+        new(Profession.LifeCoach, "life-coaches", "Life Coach", "Life Coaches",
+            "Find a Life Coach",
+            "Independent life coaches who help you set goals, make changes, and follow through.",
+            "self_improvement"),
         new(Profession.Chiropractor, "chiropractors", "Chiropractor", "Chiropractors",
             "Find a Private-Pay Chiropractor",
-            "Independent chiropractors offering straightforward, cash-based care — no insurance hoops.",
+            "Independent chiropractors with clear, upfront pricing. Book and pay directly.",
             "accessibility_new"),
         new(Profession.MassageTherapist, "massage-therapists", "Massage Therapist", "Massage Therapists",
             "Find a Massage Therapist",

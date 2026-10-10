@@ -39,6 +39,7 @@
                 </a>
                 <div class="hidden md:flex items-center gap-6">
                     <a asp-area="" asp-page="/Index" class="text-slate-600 hover:text-primary font-medium transition-colors">Find a Provider</a>
+                    <a asp-area="" asp-page="/About" class="text-slate-600 hover:text-primary font-medium transition-colors">About</a>
                     @if (User.IsInRole("Administrator"))
                     {
                         <a asp-area="" asp-page="/Admin/Providers" class="text-slate-600 hover:text-primary font-medium transition-colors">Admin</a>
@@ -73,6 +74,7 @@
                     </summary>
                     <div class="absolute right-0 top-full mt-2 w-56 bg-white border border-slate-200 rounded-xl shadow-lg py-2 flex flex-col text-slate-700 font-medium">
                         <a asp-area="" asp-page="/Index" class="px-4 py-2.5 hover:bg-slate-50">Find a Provider</a>
+                        <a asp-area="" asp-page="/About" class="px-4 py-2.5 hover:bg-slate-50">About</a>
                         @if (User.IsInRole("Administrator"))
                         {
                             <a asp-area="" asp-page="/Admin/Providers" class="px-4 py-2.5 hover:bg-slate-50">Admin</a>
@@ -107,8 +109,9 @@
     </main>
 
     <footer class="border-t border-slate-200 mt-16 py-8">
-        <div class="max-w-7xl mx-auto px-6 text-slate-500 text-sm">
-            &copy; 2026 - Private Pay Directory
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 text-slate-500 text-sm flex flex-wrap items-center justify-between gap-3">
+            <span>&copy; 2026 - Private Pay Directory</span>
+            <a asp-area="" asp-page="/About" class="hover:text-primary">About private pay</a>
         </div>
     </footer>
 

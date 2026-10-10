@@ -11,7 +11,6 @@ public class ProviderFilter
     public string? VirtualState { get; set; }
     public string? OfficeState { get; set; }
     public string? Specialty { get; set; }
-    public string? Insurance { get; set; }
     public string? Language { get; set; }
     public bool? AcceptingNewClients { get; set; }
     public string? NameContains { get; set; }

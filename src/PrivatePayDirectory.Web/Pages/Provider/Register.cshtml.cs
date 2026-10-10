@@ -54,7 +54,6 @@ public class RegisterModel(
             Email = user.Email,
             FirstName = user.FirstName ?? string.Empty,
             LastName = user.LastName ?? string.Empty,
-            InsuranceAccepted = ["Private Pay"],
         };
 
         await providerRepo.SaveAsync(provider);

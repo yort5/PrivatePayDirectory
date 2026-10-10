@@ -1,7 +1,7 @@
 @model IEnumerable<PrivatePayDirectory.Core.Models.ProfessionInfo>
 @* Link cards to other professions' directories — home page "Also find" and directory cross-promotion *@
 
-<div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
     @foreach (var p in Model)
     {
         <a asp-page="/Directory" asp-route-slug="@p.Slug"

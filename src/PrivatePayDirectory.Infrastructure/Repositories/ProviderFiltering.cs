@@ -24,8 +24,6 @@ public static class ProviderFiltering
                 q = q.Where(p => p.Offices.Any(o => string.Equals(o.State, filter.OfficeState, StringComparison.OrdinalIgnoreCase)));
             if (!string.IsNullOrWhiteSpace(filter.Specialty))
                 q = q.Where(p => p.Specialties.Contains(filter.Specialty, StringComparer.OrdinalIgnoreCase));
-            if (!string.IsNullOrWhiteSpace(filter.Insurance))
-                q = q.Where(p => p.InsuranceAccepted.Contains(filter.Insurance, StringComparer.OrdinalIgnoreCase));
             if (!string.IsNullOrWhiteSpace(filter.Language))
                 q = q.Where(p => p.Languages.Contains(filter.Language, StringComparer.OrdinalIgnoreCase));
             if (filter.AcceptingNewClients.HasValue)

@@ -22,6 +22,7 @@ public static class DemoData
         [Profession.Chiropractor] = 16,
         [Profession.MassageTherapist] = 18,
         [Profession.Hairstylist] = 15,
+        [Profession.LifeCoach] = 15,
     };
 
     public static async Task SyncAsync(IProviderRepository repo, bool enabled, ILogger logger)
@@ -79,7 +80,11 @@ public static class DemoData
                     Title = Pick(rng, Titles[info.Profession]),
                     Bio = Bio(rng, info.Profession, specialties, city.City),
                     Specialties = specialties,
-                    InsuranceAccepted = rng.NextDouble() < 0.35 ? ["Private Pay", "Sliding Scale"] : ["Private Pay"],
+                    // HSA/FSA funds generally don't cover coaching or hair, so those examples never claim it
+                    PaymentOptions = Taxonomy.PaymentOptions
+                        .Where(o => rng.NextDouble() < 0.4 &&
+                                    !(o == "HSA/FSA Accepted" && info.Profession is Profession.LifeCoach or Profession.Hairstylist))
+                        .ToList(),
                     Languages = rng.NextDouble() < 0.3 ? ["English", Pick(rng, Taxonomy.Languages.Skip(1).ToList())] : ["English"],
                     LicensedVirtualStates = virtualStates,
                     Offices = offices,
@@ -108,8 +113,8 @@ public static class DemoData
             Zip = city.Zip,
         };
 
-        // Only therapists offer virtual sessions; a mix of virtual-only, in-person-only, and both
-        if (profession != Profession.Therapist)
+        // Only therapists and coaches offer virtual sessions; a mix of virtual-only, in-person-only, and both
+        if (profession is not (Profession.Therapist or Profession.LifeCoach))
             return ([], [office]);
 
         var states = new List<string> { city.State };
@@ -134,10 +139,13 @@ public static class DemoData
                 "we'll set goals together and adjust as you go. This is an example profile for testing.",
             Profession.Chiropractor =>
                 $"Chiropractor in {city} with {years} years of experience, focusing on {focus}. " +
-                "Clear pricing, no insurance paperwork. This is an example profile for testing.",
+                "Clear, upfront pricing. This is an example profile for testing.",
             Profession.MassageTherapist =>
                 $"Licensed massage therapist in {city} specializing in {focus}. {years} years in practice; " +
                 "sessions tailored to what your body needs that day. This is an example profile for testing.",
+            Profession.LifeCoach =>
+                $"Certified coach with {years} years of experience in {focus}. We'll get clear on what you want, " +
+                "then build a plan you'll actually stick to. This is an example profile for testing.",
             _ =>
                 $"Independent stylist in {city} with {years} years behind the chair. Known for {focus}. " +
                 "Book directly with me. This is an example profile for testing.",
@@ -177,6 +185,7 @@ public static class DemoData
         [Profession.Chiropractor] = "Clinic",
         [Profession.MassageTherapist] = "Studio",
         [Profession.Hairstylist] = "Salon",
+        [Profession.LifeCoach] = "Studio",
     };
 
     private static readonly Dictionary<Profession, List<string>> Titles = new()
@@ -185,6 +194,7 @@ public static class DemoData
         [Profession.Chiropractor] = ["DC"],
         [Profession.MassageTherapist] = ["LMT", "LMT", "CMT"],
         [Profession.Hairstylist] = ["", "Master Stylist", "Colorist", "Curl Specialist"],
+        [Profession.LifeCoach] = ["", "ICF ACC", "ICF PCC", "Certified Life Coach"],
     };
 
     private static readonly List<string> FirstNames =

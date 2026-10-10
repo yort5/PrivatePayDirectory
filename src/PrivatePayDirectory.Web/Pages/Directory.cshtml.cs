@@ -16,7 +16,6 @@ public class DirectoryModel(IProviderRepository providerRepo, IPhotoService phot
 
     public IReadOnlyList<string> States => Taxonomy.UnitedStates;
     public IReadOnlyList<string> Specialties => Taxonomy.SpecialtiesByProfession[Profession.Profession];
-    public IReadOnlyList<string> InsurancePlans => Taxonomy.InsurancePlans;
     public IReadOnlyList<string> Languages => Taxonomy.Languages;
 
     /// <summary>The other professions, for the cross-promotion section.</summary>
@@ -35,7 +34,6 @@ public class DirectoryModel(IProviderRepository providerRepo, IPhotoService phot
         string? sessionType,
         string? state,
         string? specialty,
-        string? insurance,
         string? language,
         bool? acceptingClients,
         string? name)
@@ -51,7 +49,6 @@ public class DirectoryModel(IProviderRepository providerRepo, IPhotoService phot
             VirtualState = sessionType is "virtual" or "both" ? state : null,
             OfficeState = sessionType is "inperson" or "both" ? state : (sessionType == null ? state : null),
             Specialty = specialty,
-            Insurance = insurance,
             Language = language,
             AcceptingNewClients = acceptingClients,
             NameContains = name,

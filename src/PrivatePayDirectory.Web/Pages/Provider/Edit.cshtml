@@ -115,7 +115,11 @@
         @* Virtual Sessions *@
         <div class="bg-white rounded-xl border border-slate-200 p-6">
             <h2 class="text-base font-semibold text-slate-800 mb-1">Virtual Sessions</h2>
-            <p class="text-sm text-slate-500 mb-4">Select the states where you hold an active license to provide virtual services.</p>
+            <p class="text-sm text-slate-500 mb-4">
+                @(Model.Profession == PrivatePayDirectory.Core.Enums.Profession.Therapist
+                    ? "Select the states where you hold an active license to provide virtual services."
+                    : "Select the states where you offer virtual sessions.")
+            </p>
             <div class="grid grid-cols-6 sm:grid-cols-9 lg:grid-cols-10 gap-2">
                 @foreach (var state in Model.AllStates)
                 {
@@ -171,18 +175,19 @@
             </div>
         </div>
 
-        @* Insurance *@
+        @* Fees & payment *@
         <div class="bg-white rounded-xl border border-slate-200 p-6">
-            <h2 class="text-base font-semibold text-slate-800 mb-4">Payment Options</h2>
+            <h2 class="text-base font-semibold text-slate-800 mb-1">Fees &amp; Payment</h2>
+            <p class="text-sm text-slate-500 mb-4">Ways you make private pay easier for clients.</p>
             <div class="flex flex-col gap-2">
-                @foreach (var ins in Model.AllInsurance)
+                @foreach (var option in Model.AllPaymentOptions)
                 {
                     <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" name="Input.InsuranceAccepted"
-                               value="@ins"
-                               @(t.InsuranceAccepted.Contains(ins) ? "checked" : "")
+                        <input type="checkbox" name="Input.PaymentOptions"
+                               value="@option"
+                               @(t.PaymentOptions.Contains(option) ? "checked" : "")
                                class="h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary" />
-                        <span class="text-sm text-slate-700">@ins</span>
+                        <span class="text-sm text-slate-700">@option</span>
                     </label>
                 }
             </div>

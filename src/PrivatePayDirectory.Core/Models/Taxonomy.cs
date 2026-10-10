@@ -130,7 +130,7 @@ public static class Taxonomy
     [
         new(Profession.Therapist, "therapists", "Therapist", "Therapists",
             "Find a Private-Pay Therapist",
-            "Independent therapists offering virtual and in-person care. You pay them directly, so your care stays between the two of you.",
+            "Independent therapists offering virtual and in-person care. You pay them directly, so your care stays between you and them.",
             "psychology"),
         new(Profession.LifeCoach, "life-coaches", "Life Coach", "Life Coaches",
             "Find a Life Coach",

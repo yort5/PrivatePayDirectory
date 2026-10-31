@@ -13,7 +13,10 @@ public class DirectoryModel(IProviderRepository providerRepo, IPhotoService phot
     public ProfessionInfo Profession { get; private set; } = null!;
     public IReadOnlyList<ProviderModel> Providers { get; private set; } = [];
     public ProviderFilter Filter { get; private set; } = new();
+    public string? SelectedSessionType { get; private set; }
+    public string? SelectedState { get; private set; }
 
+    public IReadOnlyList<(string Country, IReadOnlyList<string> Codes)> Regions => Taxonomy.RegionsByCountry;
     public IReadOnlyList<string> Specialties => Taxonomy.SpecialtiesByProfession[Profession.Profession];
     public IReadOnlyList<string> Languages => Taxonomy.Languages;
 
@@ -23,9 +26,9 @@ public class DirectoryModel(IProviderRepository providerRepo, IPhotoService phot
 
     public List<SelectListItem> SessionTypeOptions =>
     [
-        new SelectListItem("Virtual", "virtual"),
-        new SelectListItem("In-Person", "inperson"),
-        new SelectListItem("Both", "both"),
+        new SelectListItem("Virtual", "virtual", SelectedSessionType == "virtual"),
+        new SelectListItem("In-Person", "inperson", SelectedSessionType == "inperson"),
+        new SelectListItem("Both", "both", SelectedSessionType == "both"),
     ];
 
     public async Task<IActionResult> OnGetAsync(
@@ -39,14 +42,20 @@ public class DirectoryModel(IProviderRepository providerRepo, IPhotoService phot
     {
         // The route constraint already guarantees a known slug
         Profession = Taxonomy.FindBySlug(slug)!;
+        SelectedSessionType = sessionType;
+        state = string.IsNullOrWhiteSpace(state) ? null : state.Trim().ToUpperInvariant();
+        SelectedState = state;
 
         Filter = new ProviderFilter
         {
             Profession = Profession.Profession,
             OffersVirtual = sessionType is "virtual" or "both" ? true : null,
             OffersInPerson = sessionType is "inperson" or "both" ? true : null,
+            // A state/province means: licensed there (virtual), has an office there (in-person),
+            // both for "both", and either one when no session mode is chosen
             VirtualState = sessionType is "virtual" or "both" ? state : null,
-            OfficeState = sessionType is "inperson" or "both" ? state : (sessionType == null ? state : null),
+            OfficeState = sessionType is "inperson" or "both" ? state : null,
+            AnyState = sessionType is "virtual" or "inperson" or "both" ? null : state,
             Specialty = specialty,
             Language = language,
             AcceptingNewClients = acceptingClients,

@@ -22,6 +22,9 @@ public static class ProviderFiltering
                 q = q.Where(p => p.LicensedVirtualStates.Contains(filter.VirtualState, StringComparer.OrdinalIgnoreCase));
             if (!string.IsNullOrWhiteSpace(filter.OfficeState))
                 q = q.Where(p => p.Offices.Any(o => string.Equals(o.State, filter.OfficeState, StringComparison.OrdinalIgnoreCase)));
+            if (!string.IsNullOrWhiteSpace(filter.AnyState))
+                q = q.Where(p => p.LicensedVirtualStates.Contains(filter.AnyState, StringComparer.OrdinalIgnoreCase) ||
+                                 p.Offices.Any(o => string.Equals(o.State, filter.AnyState, StringComparison.OrdinalIgnoreCase)));
             if (!string.IsNullOrWhiteSpace(filter.Specialty))
                 q = q.Where(p => p.Specialties.Contains(filter.Specialty, StringComparer.OrdinalIgnoreCase));
             if (!string.IsNullOrWhiteSpace(filter.Language))

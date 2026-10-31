@@ -10,6 +10,8 @@ public class ProviderFilter
     public bool? OffersInPerson { get; set; }
     public string? VirtualState { get; set; }
     public string? OfficeState { get; set; }
+    /// <summary>Licensed for virtual sessions in this state/province OR has an office there.</summary>
+    public string? AnyState { get; set; }
     public string? Specialty { get; set; }
     public string? Language { get; set; }
     public bool? AcceptingNewClients { get; set; }

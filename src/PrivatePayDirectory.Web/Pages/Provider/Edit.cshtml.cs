@@ -19,7 +19,7 @@ public class EditModel(
     public bool IsVisible { get; private set; }
     public Profession Profession { get; private set; }
 
-    public IReadOnlyList<string> AllStates => Taxonomy.UnitedStates;
+    public IReadOnlyList<(string Country, IReadOnlyList<string> Codes)> AllRegions => Taxonomy.RegionsByCountry;
     public IReadOnlyList<string> AllSpecialties => Taxonomy.SpecialtiesByProfession[Profession];
     public IReadOnlyList<string> AllPaymentOptions => Taxonomy.PaymentOptions;
     public IReadOnlyList<string> AllLanguages => Taxonomy.Languages;
@@ -132,6 +132,8 @@ public class ProviderInputModel
         p.AcceptingNewClients = AcceptingNewClients;
         p.LicensedVirtualStates = [.. LicensedVirtualStates];
         p.Offices = [.. Offices];
+        foreach (var office in p.Offices)
+            office.Zip = Taxonomy.NormalizePostalCode(office.Zip, office.State);
         p.Specialties = [.. Specialties];
         p.PaymentOptions = [.. PaymentOptions];
         p.Languages = [.. Languages];

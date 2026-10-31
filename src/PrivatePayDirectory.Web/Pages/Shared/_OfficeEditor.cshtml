@@ -34,24 +34,22 @@
         </div>
         <div class="grid grid-cols-2 gap-3">
             <div>
-                <label class="block text-xs font-medium text-slate-600 mb-1">State</label>
+                <label class="block text-xs font-medium text-slate-600 mb-1">State / Province</label>
                 <select data-field="State" name="Input.Offices[@Model.Index].State"
                         class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 focus:ring-primary focus:border-primary">
-                    @foreach (var s in PrivatePayDirectory.Core.Models.Taxonomy.UnitedStates)
+                    @foreach (var (country, codes) in PrivatePayDirectory.Core.Models.Taxonomy.RegionsByCountry)
                     {
-                        if (Model.Office.State == s)
-                        {
-                            <option value="@s" selected>@s</option>
-                        }
-                        else
-                        {
-                            <option value="@s">@s</option>
-                        }
+                        <optgroup label="@country">
+                            @foreach (var s in codes)
+                            {
+                                <option value="@s" selected="@(Model.Office.State == s)">@s</option>
+                            }
+                        </optgroup>
                     }
                 </select>
             </div>
             <div>
-                <label class="block text-xs font-medium text-slate-600 mb-1">Zip</label>
+                <label class="block text-xs font-medium text-slate-600 mb-1">Zip / Postal Code</label>
                 <input type="text" data-field="Zip" name="Input.Offices[@Model.Index].Zip"
                        value="@Model.Office.Zip"
                        class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 focus:ring-primary focus:border-primary" />

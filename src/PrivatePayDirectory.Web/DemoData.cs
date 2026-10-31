@@ -118,7 +118,8 @@ public static class DemoData
             return ([], [office]);
 
         var states = new List<string> { city.State };
-        states.AddRange(PickSome(rng, Taxonomy.UnitedStates.Where(s => s != city.State).ToList(), 0, 2));
+        var sameCountry = Taxonomy.IsCanadian(city.State) ? Taxonomy.CanadianProvinces : Taxonomy.UnitedStates;
+        states.AddRange(PickSome(rng, sameCountry.Where(s => s != city.State).ToList(), 0, 2));
 
         return rng.Next(3) switch
         {
@@ -171,6 +172,8 @@ public static class DemoData
         new("Philadelphia", "PA", "19107", "215"), new("San Diego", "CA", "92101", "619"),
         new("Los Angeles", "CA", "90010", "310"), new("San Francisco", "CA", "94105", "415"),
         new("Salt Lake City", "UT", "84111", "801"), new("Miami", "FL", "33131", "305"),
+        new("Toronto", "ON", "M5H 2N2", "416"), new("Vancouver", "BC", "V6B 1A1", "604"),
+        new("Calgary", "AB", "T2P 1J9", "403"), new("Ottawa", "ON", "K1P 1J1", "613"),
     ];
 
     private static readonly List<string> Streets =

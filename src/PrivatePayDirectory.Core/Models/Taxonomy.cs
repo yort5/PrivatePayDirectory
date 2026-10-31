@@ -122,6 +122,56 @@ public static class Taxonomy
     ];
 
     /// <summary>
+    /// Canadian provinces and territories. Their codes never collide with US state codes, so both
+    /// are stored in the same fields (OfficeLocation.State, Provider.LicensedVirtualStates) and the
+    /// country is derived from the code.
+    /// </summary>
+    public static readonly IReadOnlyList<string> CanadianProvinces =
+    [
+        "AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE",
+        "QC", "SK", "YT",
+    ];
+
+    /// <summary>Every selectable region, grouped by country for dropdowns and checkbox lists.</summary>
+    public static readonly IReadOnlyList<(string Country, IReadOnlyList<string> Codes)> RegionsByCountry =
+    [
+        ("United States", UnitedStates),
+        ("Canada", CanadianProvinces),
+    ];
+
+    public static bool IsCanadian(string? regionCode) =>
+        regionCode != null && CanadianProvinces.Contains(regionCode.Trim().ToUpperInvariant());
+
+    /// <summary>"States", "Provinces", or "States & Provinces", depending on which countries the codes span.</summary>
+    public static string RegionNoun(IEnumerable<string> regionCodes)
+    {
+        var codes = regionCodes.ToList();
+        var anyCanadian = codes.Any(IsCanadian);
+        var anyUs = codes.Any(c => !IsCanadian(c));
+        return (anyUs, anyCanadian) switch
+        {
+            (true, true) => "States & Provinces",
+            (false, true) => "Provinces",
+            _ => "States",
+        };
+    }
+
+    /// <summary>
+    /// Tidies a zip/postal code for storage: Canadian postal codes become "A1A 1A1" (uppercase,
+    /// single space) when they look like one; anything else is just trimmed.
+    /// </summary>
+    public static string NormalizePostalCode(string? code, string? regionCode)
+    {
+        var trimmed = (code ?? string.Empty).Trim();
+        if (!IsCanadian(regionCode)) return trimmed;
+
+        var compact = trimmed.Replace(" ", "").Replace("-", "").ToUpperInvariant();
+        return System.Text.RegularExpressions.Regex.IsMatch(compact, "^[A-Z][0-9][A-Z][0-9][A-Z][0-9]$")
+            ? $"{compact[..3]} {compact[3..]}"
+            : trimmed;
+    }
+
+    /// <summary>
     /// Every profession, in display order (Therapist leads — it's the site's primary audience).
     /// Each gets its own directory page at /{Slug}. Adding a profession: add the enum value,
     /// an entry here, and its specialties above.

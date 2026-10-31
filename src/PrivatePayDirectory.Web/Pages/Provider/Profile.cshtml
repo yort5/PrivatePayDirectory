@@ -130,12 +130,13 @@
             </div>
         }
 
-        <!-- Virtual States -->
+        <!-- Virtual States / Provinces -->
         @if (t.OffersVirtual && t.LicensedVirtualStates.Any())
         {
+            var regionNoun = PrivatePayDirectory.Core.Models.Taxonomy.RegionNoun(t.LicensedVirtualStates);
             <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-8">
                 <h2 class="text-lg font-semibold text-slate-900 mb-4">
-                    Virtual Sessions@(t.Profession == PrivatePayDirectory.Core.Enums.Profession.Therapist ? " — Licensed States" : " — States Served")
+                    Virtual Sessions — @(t.Profession == PrivatePayDirectory.Core.Enums.Profession.Therapist ? $"Licensed {regionNoun}" : $"{regionNoun} Served")
                 </h2>
                 <div class="flex flex-wrap gap-2">
                     @foreach (var s in t.LicensedVirtualStates)

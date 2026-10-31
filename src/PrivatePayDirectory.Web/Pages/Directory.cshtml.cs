@@ -14,7 +14,6 @@ public class DirectoryModel(IProviderRepository providerRepo, IPhotoService phot
     public IReadOnlyList<ProviderModel> Providers { get; private set; } = [];
     public ProviderFilter Filter { get; private set; } = new();
 
-    public IReadOnlyList<string> States => Taxonomy.UnitedStates;
     public IReadOnlyList<string> Specialties => Taxonomy.SpecialtiesByProfession[Profession.Profession];
     public IReadOnlyList<string> Languages => Taxonomy.Languages;
 

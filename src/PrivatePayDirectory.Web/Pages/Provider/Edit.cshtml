@@ -117,21 +117,25 @@
             <h2 class="text-base font-semibold text-slate-800 mb-1">Virtual Sessions</h2>
             <p class="text-sm text-slate-500 mb-4">
                 @(Model.Profession == PrivatePayDirectory.Core.Enums.Profession.Therapist
-                    ? "Select the states where you hold an active license to provide virtual services."
-                    : "Select the states where you offer virtual sessions.")
+                    ? "Select the states or provinces where you hold an active license to provide virtual services."
+                    : "Select the states or provinces where you offer virtual sessions.")
             </p>
-            <div class="grid grid-cols-6 sm:grid-cols-9 lg:grid-cols-10 gap-2">
-                @foreach (var state in Model.AllStates)
-                {
-                    <label class="flex items-center gap-1 cursor-pointer">
-                        <input type="checkbox" name="Input.LicensedVirtualStates"
-                               value="@state"
-                               @(t.LicensedVirtualStates.Contains(state) ? "checked" : "")
-                               class="h-3.5 w-3.5 rounded border-slate-300 text-primary focus:ring-primary" />
-                        <span class="text-xs text-slate-700 font-medium">@state</span>
-                    </label>
-                }
-            </div>
+            @foreach (var (country, codes) in Model.AllRegions)
+            {
+                <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-500 mb-2 @(country == Model.AllRegions[0].Country ? "" : "mt-4")">@country</h3>
+                <div class="grid grid-cols-6 sm:grid-cols-9 lg:grid-cols-10 gap-2">
+                    @foreach (var code in codes)
+                    {
+                        <label class="flex items-center gap-1 cursor-pointer">
+                            <input type="checkbox" name="Input.LicensedVirtualStates"
+                                   value="@code"
+                                   @(t.LicensedVirtualStates.Contains(code) ? "checked" : "")
+                                   class="h-3.5 w-3.5 rounded border-slate-300 text-primary focus:ring-primary" />
+                            <span class="text-xs text-slate-700 font-medium">@code</span>
+                        </label>
+                    }
+                </div>
+            }
         </div>
 
         @* In-Person Offices *@
@@ -226,7 +230,7 @@
 
 @section Scripts {
 <script>
-const US_STATES = [@Html.Raw(string.Join(",", Model.AllStates.Select(s => $"\"{s}\"")))];
+const REGIONS = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AllRegions.Select(r => new { country = r.Country, codes = r.Codes })));
 
 // ── Dirty / saved tracking ──────────────────────────────────────────────────
 const form = document.getElementById('edit-form');
@@ -337,7 +341,8 @@ function reindexOffices() {
 }
 
 function buildOfficeHtml(idx) {
-    const stateOpts = US_STATES.map(s => `<option value="${s}">${s}</option>`).join('');
+    const stateOpts = REGIONS.map(r =>
+        `<optgroup label="${r.country}">${r.codes.map(c => `<option value="${c}">${c}</option>`).join('')}</optgroup>`).join('');
     const id = crypto.randomUUID();
     return `
     <div class="office-block bg-slate-50 rounded-lg border border-slate-200 p-4">
@@ -371,14 +376,14 @@ function buildOfficeHtml(idx) {
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-medium text-slate-600 mb-1">State</label>
+            <label class="block text-xs font-medium text-slate-600 mb-1">State / Province</label>
             <select data-field="State" name="Input.Offices[${idx}].State"
                     class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 focus:ring-primary focus:border-primary">
               ${stateOpts}
             </select>
           </div>
           <div>
-            <label class="block text-xs font-medium text-slate-600 mb-1">Zip</label>
+            <label class="block text-xs font-medium text-slate-600 mb-1">Zip / Postal Code</label>
             <input type="text" data-field="Zip" name="Input.Offices[${idx}].Zip"
                    class="w-full rounded-lg border-slate-300 text-sm px-3 py-2 focus:ring-primary focus:border-primary" />
           </div>

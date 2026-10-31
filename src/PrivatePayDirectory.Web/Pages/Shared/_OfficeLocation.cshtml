@@ -3,7 +3,8 @@
 
 @{
     var apiKey = Config["GoogleMaps:ApiKey"] ?? "";
-    var address = Uri.EscapeDataString($"{Model.Street}, {Model.City}, {Model.State} {Model.Zip}");
+    var country = PrivatePayDirectory.Core.Models.Taxonomy.IsCanadian(Model.State) ? "Canada" : "USA";
+    var address = Uri.EscapeDataString($"{Model.Street}, {Model.City}, {Model.State} {Model.Zip}, {country}");
     var embedUrl = $"https://www.google.com/maps/embed/v1/place?key={apiKey}&q={address}";
 }
 
@@ -12,6 +13,10 @@
     <address>
         @Model.Street<br />
         @Model.City, @Model.State @Model.Zip
+        @if (country == "Canada")
+        {
+            <br />@country
+        }
     </address>
     @if (!string.IsNullOrEmpty(Model.Phone))
     {
